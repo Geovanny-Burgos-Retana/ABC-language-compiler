@@ -5,9 +5,17 @@
  */
 package analizador.lexico;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import jflex.Main;
 
 /**
  *
@@ -33,7 +41,7 @@ public class Interfaz extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        taRespuestas = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -45,9 +53,9 @@ public class Interfaz extends javax.swing.JFrame {
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        taRespuestas.setColumns(20);
+        taRespuestas.setRows(5);
+        jScrollPane1.setViewportView(taRespuestas);
 
         jPanel1.add(jScrollPane1);
 
@@ -103,36 +111,67 @@ public class Interfaz extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        try{
-        /*Generar el archivo Flex*/
-        File arch = new File("src/analizador/lexico/Lexer.java");
-        //Reemplaza el archivo existente con el nuevo archivo limpio
-        //si el archivo existe, eliminelo
-        if(arch.exists()){
-            Path currentRelativePath = Paths.get("");
-            String nuevoDir = currentRelativePath.toAbsolutePath().toString() + File.separator 
-            + "src" + File.separator
-            + "analizador" + File.separator 
-            + "lexico" + File.separator 
-            + arch.getName();
-            
-            File archViejo = new File(nuevoDir);
-            archViejo.delete();
-        }
-        
-        //generar el nuevo archivo java a partir del flex
-        String[] flex = {"src/analizador/lexico/Lexer.flex"};        
-        jflex.Main.main(flex);
+        try {
+            /*Generar el archivo Flex*/
+            File arch = new File("src/analizador/lexico/Lexer.java");
+            //Reemplaza el archivo existente con el nuevo archivo limpio
+            //si el archivo existe, eliminelo
+            if (arch.exists()) {
+                Path currentRelativePath = Paths.get("");
+                String nuevoDir = currentRelativePath.toAbsolutePath().toString() + File.separator
+                        + "src" + File.separator
+                        + "analizador" + File.separator
+                        + "lexico" + File.separator
+                        + arch.getName();
+
+                File archViejo = new File(nuevoDir);
+                archViejo.delete();
+            }
+
+            //generar el nuevo archivo java a partir del flex
+            String[] flex = {"src/analizador/lexico/Lexer.flex"};
+            jflex.Main.main(flex);
             System.out.println("Hola mundo");
-        //JOptionPane.showMessageDialog(null, "Archivo Flex cargado con exito.");
-        labelJFlex.setText("Archivo Flex cargado con exito.");
-        }catch(Exception e){
+            //JOptionPane.showMessageDialog(null, "Archivo Flex cargado con exito.");
+            labelJFlex.setText("Archivo Flex cargado con exito.");
+        } catch (Exception e) {
             labelJFlex.setText("Error: Archivo Flex no se pudo cargar");
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Escoger archivos
+        try {
+            JFileChooser chooser = new JFileChooser();
+            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+            chooser.setFileFilter(filter);
+            int returnVal = chooser.showOpenDialog(null);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                String entrada = chooser.getSelectedFile().getPath();
+                BufferedReader bf = null;
+                try {
+                    //llamar a los tokens uno por uno, con la funcion nexttoken
+                    bf = new BufferedReader(new FileReader(entrada));
+                    LexerAnalyzer a = new LexerAnalyzer(bf);
+                    Yytoken token = null;
+                    do {
+                        token = a.nextToken();                        
+                    } while (token != null);
+                    taRespuestas.setText(a.toString());
+                } catch (Exception ex) {
+                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                } finally {
+                    try {
+                        bf.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+            labelDir.setText("Archivo .txt cargado correctamente");
+            //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
+        } catch (Exception e) {
+            labelDir.setText("Error: no se pudo cargar el archivo");
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
@@ -177,8 +216,8 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel labelDir;
     private javax.swing.JLabel labelJFlex;
+    private javax.swing.JTextArea taRespuestas;
     // End of variables declaration//GEN-END:variables
 }

@@ -20,11 +20,10 @@ public class Line {
 
     @Override
     public String toString() {
-        String value = numLine + "(" + occurrences + ')';
-        if (value != "") {
-            return value;
+        if (occurrences > 1) {
+            return numLine + "(" + occurrences + ')';
         }
-        return "";
+        return ""+numLine;
     }
 
     

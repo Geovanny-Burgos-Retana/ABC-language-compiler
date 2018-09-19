@@ -124,8 +124,11 @@ class Yytoken {
     private boolean addToken(Yytoken newToken, int line) {
         for (Yytoken token : tokens) {
             if (token.getName().equals(newToken.getName()) && token.getType().equals(newToken.getType())) {
+                System.out.println("Entro2");
                 for (int i = 0; i < token.getLines().size(); i++) {
+                    System.out.println("Entro1");
                     if (token.getLines().get(i).equals(line)) {
+                        System.out.println("Entro");
                         token.getLines().get(i).setOccurrences(token.getLines().get(i).getOccurrences() + 1);
                         return true;
                     }
@@ -136,8 +139,25 @@ class Yytoken {
         }
         count++;
         newToken.setId(count);
+        newToken.getLines().add(new Line(line));
         tokens.add(newToken);
         return true;
+    }
+
+    /**
+     * @return the lines
+     */
+    public ArrayList<Yytoken> getTokens() {
+        return tokens;
+    }
+    
+    @Override
+    public String toString() {
+        String value = "";
+        for (Yytoken token : tokens) {
+            value += token.toString() + "\n";
+        }
+        return value;
     }
 %}
 
@@ -149,7 +169,6 @@ class Yytoken {
 %eof{
     try{
         this.writeOutputFile();
-        System.exit(0);
     }catch(IOException ioe){
         ioe.printStackTrace();
     }
@@ -240,4 +259,7 @@ Integer = [1-9]{Digit}+
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
     addToken(token, yyline);
     return token;
+}
+. {
+    
 }

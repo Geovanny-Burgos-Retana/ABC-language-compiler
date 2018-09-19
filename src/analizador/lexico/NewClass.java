@@ -52,8 +52,9 @@ public class NewClass {
                 return true;
             }
         }
-        count++;
+        count++;        
         newToken.setId(count);
+        newToken.getLines().add(new Line(line));
         tokens.add(newToken);
         return true;
     }*/
