@@ -178,11 +178,7 @@ class Yytoken {
 %line
 
 /* Declaraciones de las expresiones regulares */
-Comment = "(*" [^*] ~"*)" | "{" [^*] ~"}"
-CommentLine = "//".*
-LineTerminator = \r|\n|\r\n
-Space = " "
-Tabulator = \t
+
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
 Identifer = [A-Za-z][A-Za-z0-9]*
 Real_Number = [0-9]+"."[0-9]+
