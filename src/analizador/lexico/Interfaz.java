@@ -41,45 +41,64 @@ public class Interfaz extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        taRespuestas = new javax.swing.JTextArea();
+        taTokens = new javax.swing.JTextArea();
+        jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        taErrores = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnArchivo = new javax.swing.JButton();
+        btnGenerar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         labelDir = new javax.swing.JLabel();
         labelJFlex = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.LINE_AXIS));
 
-        taRespuestas.setColumns(20);
-        taRespuestas.setRows(5);
-        jScrollPane1.setViewportView(taRespuestas);
+        taTokens.setColumns(20);
+        taTokens.setRows(5);
+        jScrollPane1.setViewportView(taTokens);
 
         jPanel1.add(jScrollPane1);
 
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jSeparator1.setMaximumSize(new java.awt.Dimension(3767, 3767));
+        jPanel1.add(jSeparator1);
+
+        taErrores.setColumns(20);
+        taErrores.setRows(5);
+        jScrollPane2.setViewportView(taErrores);
+
+        jPanel1.add(jScrollPane2);
+
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        jButton1.setText("Escoger archivo");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnArchivo.setText("Escoger archivo");
+        btnArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnArchivoActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton1, java.awt.BorderLayout.CENTER);
+        jPanel2.add(btnArchivo, java.awt.BorderLayout.CENTER);
 
-        jButton2.setText("Generar");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnGenerar.setText("Generar");
+        btnGenerar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnGenerarActionPerformed(evt);
             }
         });
-        jPanel2.add(jButton2, java.awt.BorderLayout.PAGE_START);
+        jPanel2.add(btnGenerar, java.awt.BorderLayout.PAGE_START);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
         jPanel3.add(labelDir, java.awt.BorderLayout.CENTER);
         jPanel3.add(labelJFlex, java.awt.BorderLayout.PAGE_START);
+
+        jLabel1.setText("Listado de Tokens");
+
+        jLabel2.setText("Listado de Errores");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -92,8 +111,14 @@ public class Interfaz extends javax.swing.JFrame {
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 576, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(105, 105, 105)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2)
+                .addGap(118, 118, 118))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,15 +127,19 @@ public class Interfaz extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 347, Short.MAX_VALUE)
+                .addGap(29, 29, 29)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
+                .addGap(2, 2, 2)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnGenerarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGenerarActionPerformed
         try {
             /*Generar el archivo Flex*/
             File arch = new File("src/analizador/lexico/Lexer.java");
@@ -127,19 +156,18 @@ public class Interfaz extends javax.swing.JFrame {
                 File archViejo = new File(nuevoDir);
                 archViejo.delete();
             }
-
+                
             //generar el nuevo archivo java a partir del flex
-            String[] flex = {"src/analizador/lexico/Lexer.flex"};
+            String[] flex = {"src/analizador/lexico/Lexer.flex"};            
             jflex.Main.main(flex);
-            System.out.println("Hola mundo");
             //JOptionPane.showMessageDialog(null, "Archivo Flex cargado con exito.");
             labelJFlex.setText("Archivo Flex cargado con exito.");
         } catch (Exception e) {
             labelJFlex.setText("Error: Archivo Flex no se pudo cargar");
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnGenerarActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
         try {
             JFileChooser chooser = new JFileChooser();
             FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
@@ -156,7 +184,11 @@ public class Interfaz extends javax.swing.JFrame {
                     do {
                         token = a.nextToken();                        
                     } while (token != null);
-                    taRespuestas.setText(a.toString());
+                    taTokens.setText(a.toStringTokens());
+                   
+                    //Acá se debe incluir validación para escribir errores y no tokens
+                    taErrores.setText(a.toStringErrores());
+                    
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
@@ -172,7 +204,7 @@ public class Interfaz extends javax.swing.JFrame {
         } catch (Exception e) {
             labelDir.setText("Error: no se pudo cargar el archivo");
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnArchivoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -210,14 +242,19 @@ public class Interfaz extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton btnArchivo;
+    private javax.swing.JButton btnGenerar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel labelDir;
     private javax.swing.JLabel labelJFlex;
-    private javax.swing.JTextArea taRespuestas;
+    private javax.swing.JTextArea taErrores;
+    private javax.swing.JTextArea taTokens;
     // End of variables declaration//GEN-END:variables
 }

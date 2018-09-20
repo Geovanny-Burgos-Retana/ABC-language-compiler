@@ -29,7 +29,7 @@ class Yytoken {
 
     @Override
     public String toString() {
-        return name + " " + type + " " + lines;
+        return name + ": " + type + " - " + lines;
     }
 
     /**
@@ -159,6 +159,26 @@ class Yytoken {
         }
         return value;
     }
+
+    public String toStringTokens() {
+        String value = "";
+        for (Yytoken token : tokens) {
+            if(!token.getType().equals(Types_Tokens.ERROR)){
+                value += token.toString() + "\n";
+            }            
+        }
+        return value;
+    }
+    
+    public String toStringErrores() {
+        String value = "";
+        for (Yytoken token : tokens) {
+            if(token.getType().equals(Types_Tokens.ERROR)){
+                value += token.toString() + "\n";
+            }            
+        }
+        return value;
+    }
 %}
 
 // Inicializador de variables
@@ -178,21 +198,24 @@ class Yytoken {
 %line
 
 /* Declaraciones de las expresiones regulares */
-Comment = "(*" [^*] ~"*)" | "{" [^*] ~"}"
-CommentLine = "//".*
+Comment = "(*".*
+CommentLine = "//".* | "(*".*"*)" | "{".*"}"
 LineTerminator = \r|\n|\r\n
 Space = " "
 Tabulator = \t
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
-Identifer = [A-Za-z][A-Za-z0-9]*
+Scientific_Notation = [0-9]*\.?[0-9]+([e|E][-+]?[0-9]+)?
 Real_Number = [0-9]+"."[0-9]+
-Scientific_Notation = {Integer}+("e"|"E")("-"|""){Integer}+
+Identifer = [A-Za-z][A-Za-z0-9]*
 String = "\""[^\n\r]+"\""
 Numeral_Character = "#"([0-9] | [0-9][0-9] | [0-9][0-9][0-9])
 Operator = "," | ";" | "++" | "--" | ">=" | ">" | "<=" | "<" | "<>" | "=" | "+" | "-" | "*" | "/" | "(" | ")" | "[" | "]" | ":=" | "." | ":" | "+=" | "-=" | "*=" | "/=" | ">>" | "<<" | "<<=" | ">>="
 
 Digit = [0-9]
-Integer = [1-9]{Digit}+
+Numero = [1-9]{Digit}+
+
+Error = [^]
+
 %%
 
 
@@ -232,19 +255,19 @@ Integer = [1-9]{Digit}+
 }
 // ---------------------------------- 8 ----------------------------------
 {Real_Number} {
-    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_NUMERAL);
     addToken(token, yyline);
     return token;
 }
 // ---------------------------------- 9 ----------------------------------
 {Scientific_Notation} {
-    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_NUMERAL);
     addToken(token, yyline);
     return token;
 }
 // --------------------------------- 10 ----------------------------------
 {String} {
-    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_STRING);
     addToken(token, yyline);
     return token;
 }
@@ -256,10 +279,17 @@ Integer = [1-9]{Digit}+
 }
 // --------------------------------- 12 ----------------------------------
 {Operator} {
-    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.OPERADOR);
     addToken(token, yyline);
     return token;
 }
+// --------------------------------- 13 ----------------------------------
+{Error} {
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
+    addToken(token, yyline);
+    return token;
+}
+
 . {
     
 }

@@ -10,5 +10,5 @@ package analizador.lexico;
  * @author geovanny
  */
 public enum Types_Tokens {
-    IDENTIFICADOR, OPERADOR, PALABRA_RESERVADA, LITERAL
+    IDENTIFICADOR, OPERADOR, PALABRA_RESERVADA, LITERAL, LITERAL_STRING, LITERAL_NUMERAL, ERROR
 }

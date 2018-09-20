@@ -23,7 +23,7 @@ public class Line {
         if (occurrences > 1) {
             return numLine + "(" + occurrences + ')';
         }
-        return ""+numLine;
+        return "" + numLine;
     }
 
     
