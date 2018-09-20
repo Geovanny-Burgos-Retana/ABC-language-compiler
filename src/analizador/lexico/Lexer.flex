@@ -127,7 +127,7 @@ class Yytoken {
                 System.out.println("Entro2");
                 for (int i = 0; i < token.getLines().size(); i++) {
                     System.out.println("Entro1");
-                    if (token.getLines().get(i).equals(line)) {
+                    if (token.getLines().get(i).getNumLine() == line) {
                         System.out.println("Entro");
                         token.getLines().get(i).setOccurrences(token.getLines().get(i).getOccurrences() + 1);
                         return true;
@@ -204,7 +204,7 @@ LineTerminator = \r|\n|\r\n
 Space = " "
 Tabulator = \t
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
-Scientific_Notation = [0-9]*\.?[0-9]+([e|E][-+]?[0-9]+)?
+Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+][0-9]+)
 Real_Number = [0-9]+"."[0-9]+
 Identifer = [A-Za-z][A-Za-z0-9]*
 String = "\""[^\n\r]+"\""
