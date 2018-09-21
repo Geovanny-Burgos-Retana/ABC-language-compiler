@@ -123,11 +123,11 @@ class Yytoken {
      */
     private boolean addToken(Yytoken newToken, int line) {
         for (Yytoken token : tokens) {
-            if (token.getName().equals(newToken.getName()) && token.getType().equals(newToken.getType())) {
+            if (token.getName().toUpperCase().equals(newToken.getName().toUpperCase()) && token.getType().equals(newToken.getType())) {
                 System.out.println("Entro2");
                 for (int i = 0; i < token.getLines().size(); i++) {
                     System.out.println("Entro1");
-                    if (token.getLines().get(i).equals(line)) {
+                    if (token.getLines().get(i).getNumLine() == line) {
                         System.out.println("Entro");
                         token.getLines().get(i).setOccurrences(token.getLines().get(i).getOccurrences() + 1);
                         return true;
@@ -198,21 +198,23 @@ class Yytoken {
 %line
 
 /* Declaraciones de las expresiones regulares */
-Comment = "(*".*
-CommentLine = "//".* | "(*".*"*)" | "{".*"}"
+WHITE =[ \t\r\n]
+CommentBlock2 = "(""*"([^"*)"]|{WHITE})*"*"")" | "{"([^"}"]|{WHITE})*"}"
+
+CommentLine = "//".*
+CommentBlock = "//".* | "(*".*"*)" | "{".*"}"
 LineTerminator = \r|\n|\r\n
 Space = " "
 Tabulator = \t
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
-Scientific_Notation = [0-9]*\.?[0-9]+([e|E][-+]?[0-9]+)?
+Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+][0-9]+)
 Real_Number = [0-9]+"."[0-9]+
-Identifer = [A-Za-z][A-Za-z0-9]*
-String = "\""[^\n\r]+"\""
+IdentiferWrong = [A-Za-z][A-Za-z0-9]{127,500}  //500 es un valor fijo, se puede variar segun necesidad, sin embargo ente mas grande sea, mas estados requiere, haciendolo mas lento.
+Identifer = [A-Za-z][A-Za-z0-9]{0,126}
+StringLine = "\"".*"\""
+StringBlock = "\""[.*]~"\""
 Numeral_Character = "#"([0-9] | [0-9][0-9] | [0-9][0-9][0-9])
 Operator = "," | ";" | "++" | "--" | ">=" | ">" | "<=" | "<" | "<>" | "=" | "+" | "-" | "*" | "/" | "(" | ")" | "[" | "]" | ":=" | "." | ":" | "+=" | "-=" | "*=" | "/=" | ">>" | "<<" | "<<=" | ">>="
-
-Digit = [0-9]
-Numero = [1-9]{Digit}+
 
 Error = [^]
 
@@ -222,11 +224,15 @@ Error = [^]
 /* Seccion de reglas lexicas */
 %%
 // ---------------------------------- 1 ----------------------------------
-{Comment}    {
+{CommentLine} {
+    /*Ignore*/
+}
+
+{CommentBlock2} {
     /*Ignore*/
 }
 // ---------------------------------- 2 ----------------------------------
-{CommentLine} {
+{CommentBlock} {
     /*Ignore*/
 }
 // ---------------------------------- 3 ----------------------------------
@@ -253,6 +259,12 @@ Error = [^]
     addToken(token, yyline);
     return token;
 }
+
+{IdentiferWrong} {
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
+    addToken(token, yyline);
+    return token;
+}
 // ---------------------------------- 8 ----------------------------------
 {Real_Number} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_NUMERAL);
@@ -266,14 +278,20 @@ Error = [^]
     return token;
 }
 // --------------------------------- 10 ----------------------------------
-{String} {
+{StringLine} {
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_STRING);
+    addToken(token, yyline);
+    return token;
+}
+
+{StringBlock} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_STRING);
     addToken(token, yyline);
     return token;
 }
 // --------------------------------- 11 ----------------------------------
 {Numeral_Character} {
-    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL);
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_STRING);
     addToken(token, yyline);
     return token;
 }
@@ -288,8 +306,4 @@ Error = [^]
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
     addToken(token, yyline);
     return token;
-}
-
-. {
-    
 }
