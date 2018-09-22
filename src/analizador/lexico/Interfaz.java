@@ -17,10 +17,6 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import jflex.Main;
 
-/**
- *
- * @author geovanny
- */
 public class Interfaz extends javax.swing.JFrame {
 
     /**
@@ -46,13 +42,20 @@ public class Interfaz extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         taErrores = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
-        btnArchivo = new javax.swing.JButton();
         btnGenerar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        labelDir = new javax.swing.JLabel();
         labelJFlex = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        btnArchivo = new javax.swing.JButton();
+        labelDir = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,14 +79,6 @@ public class Interfaz extends javax.swing.JFrame {
 
         jPanel2.setLayout(new java.awt.BorderLayout());
 
-        btnArchivo.setText("Escoger archivo");
-        btnArchivo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnArchivoActionPerformed(evt);
-            }
-        });
-        jPanel2.add(btnArchivo, java.awt.BorderLayout.CENTER);
-
         btnGenerar.setText("Generar");
         btnGenerar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -93,12 +88,43 @@ public class Interfaz extends javax.swing.JFrame {
         jPanel2.add(btnGenerar, java.awt.BorderLayout.PAGE_START);
 
         jPanel3.setLayout(new java.awt.BorderLayout());
-        jPanel3.add(labelDir, java.awt.BorderLayout.CENTER);
         jPanel3.add(labelJFlex, java.awt.BorderLayout.PAGE_START);
 
-        jLabel1.setText("Listado de Tokens");
+        jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel1.setText("Listado de Tokens Válidos");
 
-        jLabel2.setText("Listado de Errores");
+        jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        jLabel2.setText("Listado de Errores Léxicos");
+
+        jLabel3.setText("Token");
+
+        jLabel4.setText("Tipo");
+
+        jLabel5.setText("Línea (Apariciones)");
+
+        jLabel6.setText("Línea (Apariciones)");
+
+        jLabel7.setText("Tipo");
+
+        jLabel8.setText("Token");
+
+        btnArchivo.setText("Escoger archivo");
+        btnArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnArchivoActionPerformed(evt);
+            }
+        });
+
+        jLabel9.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(0, 0, 153));
+        jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel9.setText("Analizador Léxico - Scanner");
+        jLabel9.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        jLabel9.setAlignmentY(0.8F);
+        jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel9.setMaximumSize(new java.awt.Dimension(294, 67));
+        jLabel9.setMinimumSize(new java.awt.Dimension(254, 57));
+        jLabel9.setPreferredSize(new java.awt.Dimension(254, 87));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -108,31 +134,69 @@ public class Interfaz extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 714, Short.MAX_VALUE))
-                .addContainerGap())
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(labelDir, javax.swing.GroupLayout.PREFERRED_SIZE, 775, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 161, Short.MAX_VALUE)
+                        .addComponent(jLabel4)
+                        .addGap(140, 140, 140)
+                        .addComponent(jLabel5)
+                        .addGap(144, 144, 144)
+                        .addComponent(jLabel8)
+                        .addGap(144, 144, 144)
+                        .addComponent(jLabel7)
+                        .addGap(134, 134, 134)
+                        .addComponent(jLabel6)
+                        .addGap(133, 133, 133))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(151, 151, 151)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel2)
+                        .addGap(194, 194, 194))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(105, 105, 105)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel2)
-                .addGap(118, 118, 118))
+                .addGap(448, 448, 448)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(29, 29, 29)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnArchivo)
+                    .addComponent(labelDir, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
-                .addGap(2, 2, 2)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(13, 13, 13)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel7)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 447, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -160,7 +224,6 @@ public class Interfaz extends javax.swing.JFrame {
             //generar el nuevo archivo java a partir del flex
             String[] flex = {"src/analizador/lexico/Lexer.flex"};            
             jflex.Main.main(flex);
-            //JOptionPane.showMessageDialog(null, "Archivo Flex cargado con exito.");
             labelJFlex.setText("Archivo Flex cargado con exito.");
         } catch (Exception e) {
             labelJFlex.setText("Error: Archivo Flex no se pudo cargar");
@@ -184,9 +247,8 @@ public class Interfaz extends javax.swing.JFrame {
                     do {
                         token = a.nextToken();                        
                     } while (token != null);
+                    
                     taTokens.setText(a.toStringTokens());
-                   
-                    //Acá se debe incluir validación para escribir errores y no tokens
                     taErrores.setText(a.toStringErrores());
                     
                 } catch (Exception ex) {
@@ -246,6 +308,13 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JButton btnGenerar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

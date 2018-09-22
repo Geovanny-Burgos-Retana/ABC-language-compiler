@@ -10,10 +10,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/**
- *
- * @author geovanny
- */
 class Yytoken {
     
     private int id; //Identificador único para cada TOKEN
@@ -29,7 +25,8 @@ class Yytoken {
 
     @Override
     public String toString() {
-        return name + ": " + type + " - " + lines;
+        String token = name + "\t" + "\t" + type + "\t" + "\t" + lines;
+        return token;
     }
 
     /**
@@ -200,19 +197,20 @@ class Yytoken {
 /* Declaraciones de las expresiones regulares */
 WHITE =[ \t\r\n]
 CommentBlock2 = "(""*"([^"*)"]|{WHITE})*"*"")" | "{"([^"}"]|{WHITE})*"}"
-
 CommentLine = "//".*
 CommentBlock = "//".* | "(*".*"*)" | "{".*"}"
+CommentBlock2Wrong = "(""*"([^"*)"]|{WHITE})* | "{"([^"}"]|{WHITE})*
 LineTerminator = \r|\n|\r\n
 Space = " "
 Tabulator = \t
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
-Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+][0-9]+)
+Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+]{0,1}[0-9]+)
 Real_Number = [0-9]+"."[0-9]+
 IdentiferWrong = [A-Za-z][A-Za-z0-9]{127,500}  //500 es un valor fijo, se puede variar segun necesidad, sin embargo ente mas grande sea, mas estados requiere, haciendolo mas lento.
+IdentiferWrong2 = [0-9][A-Za-z0-9]{0,126}
 Identifer = [A-Za-z][A-Za-z0-9]{0,126}
 StringLine = "\"".*"\""
-StringBlock = "\""[.*]~"\""
+StringBlock = "\""([^"\""]|{WHITE})*"\""
 Numeral_Character = "#"([0-9] | [0-9][0-9] | [0-9][0-9][0-9])
 Operator = "," | ";" | "++" | "--" | ">=" | ">" | "<=" | "<" | "<>" | "=" | "+" | "-" | "*" | "/" | "(" | ")" | "[" | "]" | ":=" | "." | ":" | "+=" | "-=" | "*=" | "/=" | ">>" | "<<" | "<<=" | ">>="
 
@@ -248,6 +246,12 @@ Error = [^]
     /*Ignore*/
 }
 // ---------------------------------- 6 ----------------------------------
+{CommentBlock2Wrong} {
+   Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
+    addToken(token, yyline);
+    return token;
+}
+
 {Reserved_Word} {
    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA);
     addToken(token, yyline);
@@ -261,6 +265,12 @@ Error = [^]
 }
 
 {IdentiferWrong} {
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
+    addToken(token, yyline);
+    return token;
+}
+
+{IdentiferWrong2} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
     addToken(token, yyline);
     return token;
