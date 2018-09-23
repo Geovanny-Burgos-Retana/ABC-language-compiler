@@ -1,0 +1,16 @@
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa		IDENTIFICADOR		[0]
+#65		LITERAL_STRING		[2]
+"car"		LITERAL_STRING		[2]
+2		ERROR		[2]
+=		OPERADOR		[2]
+7		ERROR		[2]
+5.5		LITERAL_NUMERAL		[2]
+3.0E-5		LITERAL_NUMERAL		[2]
+IN		PALABRA_RESERVADA		[5]
+collection		IDENTIFICADOR		[5]
+(*FOR line IN document:}
+      
+      {FOR word IN split line:}
+         //IF word not.in word collection:
+            //INSERT word IN collection
+   RETURN return collection		ERROR		[6]
