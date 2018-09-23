@@ -98,19 +98,7 @@ class Yytoken {
     private int count; // Este lleva la cuenta de los TOKENS y es también el identificador
     private ArrayList<Yytoken> tokens = new ArrayList<>();
 
-    /**
-     * Escribe los resultados en un archivo de salida
-     * @throws IOException 
-     */
-    private void writeOutputFile() throws IOException {
-        String filename = "output.out";
-        BufferedWriter out = new BufferedWriter(new FileWriter(filename));
-        for (Yytoken token : tokens) {
-            out.write(token.toString());
-            out.newLine();
-        }
-        out.close();
-    }
+    
     
     /**
      * Valida la inserción de un nuevo token, si exite agrega la line o aumenta las ocurrencias del TOKEN en la misma linea
@@ -183,13 +171,6 @@ class Yytoken {
     count = 0;
     tokens = new ArrayList<Yytoken>();
 %init}
-%eof{
-    try{
-        this.writeOutputFile();
-    }catch(IOException ioe){
-        ioe.printStackTrace();
-    }
-%eof}
 
 // Activador del conteo de lineas
 %line
@@ -206,14 +187,14 @@ Tabulator = \t
 Reserved_Word = "AND" | "ARRAY" | "BEGIN" | "BOOLEAN" | "BYTE" | "CASE" | "CHAR" | "CONST" | "DIV" | "DO" | "DOWNTO" | "ELSE" | "END" | "FALSE" | "FILE" | "FOR" | "FORWARD" | "FUNCTION" | "GOTO" | "IF" | "IN" | "INLINE" | "INT" | "LABEL" | "LONGINT" | "MOD" | "NIL" | "NOT" | "OF" | "OR" | "PACKED" | "PROCEDURE" | "PROGRAM" | "READ" | "REAL" | "RECORD" | "REPEAT" | "SET" | "SHORTINT" | "STRING" | "THEN" | "TO" | "TRUE" | "TYPE" | "UNTIL" | "VAR" | "WHILE" | "WITH" | "WRITE" | "XOR"
 Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+]{0,1}[0-9]+)
 Real_Number = [0-9]+"."[0-9]+
-IdentiferWrong = [A-Za-z][A-Za-z0-9]{127,500}  //500 es un valor fijo, se puede variar segun necesidad, sin embargo ente mas grande sea, mas estados requiere, haciendolo mas lento.
-IdentiferWrong2 = [0-9][A-Za-z0-9]{0,126}
-Identifer = [A-Za-z][A-Za-z0-9]{0,126}
+IdentifierWrong = [A-Za-z][A-Za-z0-9]{127,500}  //500 es un valor fijo, se puede variar segun necesidad, sin embargo ente mas grande sea, mas estados requiere, haciendolo mas lento.
+IdentifierWrong2 = [0-9][A-Za-z0-9]{0,126}
+Identifier = [A-Za-z][A-Za-z0-9]{0,126}
 StringLine = "\"".*"\""
 StringBlock = "\""([^"\""]|{WHITE})*"\""
 Numeral_Character = "#"([0-9] | [0-9][0-9] | [0-9][0-9][0-9])
 Operator = "," | ";" | "++" | "--" | ">=" | ">" | "<=" | "<" | "<>" | "=" | "+" | "-" | "*" | "/" | "(" | ")" | "[" | "]" | ":=" | "." | ":" | "+=" | "-=" | "*=" | "/=" | ">>" | "<<" | "<<=" | ">>="
-
+DecIntegerLiteral = 0 | [1-9][0-9]*
 Error = [^]
 
 %%
@@ -228,6 +209,12 @@ Error = [^]
 
 {CommentBlock2} {
     /*Ignore*/
+}
+
+{DecIntegerLiteral} {
+    Yytoken token = new Yytoken(count, yytext(), Types_Tokens.LITERAL_NUMERAL);
+    addToken(token, yyline);
+    return token;
 }
 // ---------------------------------- 2 ----------------------------------
 {CommentBlock} {
@@ -258,19 +245,19 @@ Error = [^]
     return token;
 }
 // ---------------------------------- 7 ----------------------------------
-{Identifer} {
+{Identifier} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.IDENTIFICADOR);
     addToken(token, yyline);
     return token;
 }
 
-{IdentiferWrong} {
+{IdentifierWrong} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
     addToken(token, yyline);
     return token;
 }
 
-{IdentiferWrong2} {
+{IdentifierWrong2} {
     Yytoken token = new Yytoken(count, yytext(), Types_Tokens.ERROR);
     addToken(token, yyline);
     return token;
