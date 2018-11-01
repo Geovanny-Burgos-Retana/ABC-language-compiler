@@ -1,0 +1,148 @@
+package analizador.lexico;
+
+import java_cup.runtime.*;
+import java.io.FileReader;
+import java.util.ArrayList;
+
+parser code {:
+
+    private ArrayList<String> errores = new ArrayList<String>();
+    
+    public void imprimirErrores() {
+        System.out.println("\nErrores sintácticos: ");
+        for (String error : errores) {
+            System.out.println(error);
+        }
+    }    
+    
+    /* Reporte de error encontrado. */
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("Error");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {                
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0)
+                    m.append(", column "+(s.right+1));
+            }
+        }
+        m.append(" : "+message);
+        System.out.println(m);
+    }
+   
+    /* Cuando se encuentra un error de donde el sistema no puede
+        recuperarse, se lanza un error fatal. Se despliega el mensaje
+        de error y se finaliza la ejecucion. */
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        System.exit(1);
+    }    
+
+:}
+
+// TERMINALES -----------------------------------------------------------------
+terminal
+    // TIPOS DE DATO
+    DATA_TYPE,    
+    // PALABRAS RESERVADAS
+    RW_BEGIN, RW_CONST, RW_DO, RW_ELSE, RW_END, RW_FALSE, RW_FOR, 
+    RW_FUNCTION, RW_IF, RW_OF, RW_PROCEDURE, RW_PROGRAM, RW_READ, 
+    RW_THEN, RW_TO, RW_TRUE, RW_UNTIL, RW_VAR, RW_WHITE, RW_WRITE,
+    // OPERADORES ARITMETICOS
+    OP_PLUSPLUS, OP_LESSLESS, OP_TWOPOINTSEGUAL, OP_PLUS, OP_LESS,
+    OP_MULTIPLY, OP_DIVIDE, OP_MOD, OP_LEFTPARENTHESIS, OP_RIGHTPARENTHESIS,
+    OP_PLUSEQUAL, OP_LESSEQUAL, OP_MULTEQUAL, OP_DIVEQUAL, OP_DIV, 
+    OP_COMMA, OP_SEMI, OP_TWOPOINTS,
+    // OPERADORES BOOLEANOS
+    OPB_EQUAL, OPB_GREATEREQUAL, OPB_GREATER, OPB_LESSEQUAL,
+    OPB_LESS, OPB_DIFERENT, OPB_OR, OPB_AND, OPB_NOT, 
+    // IDENTIFICADORES
+    IDENTIFIER;
+
+terminal Integer ENTERO;
+terminal Double  REAL;
+terminal Double  SCIENTIFIC_NOTATION;
+terminal String  STRING_LINE;
+terminal String  STRING_BLOCK;
+terminal String  NUMERAL_CHARACTER;
+
+// NO TERMINALES --------------------------------------------------------------
+non terminal 
+    declaration_program, optional_sections,
+    constants_section, declarations_constants, declaration_constant,
+    variables_section, declarations_variables, declaration_var,
+    functions_section, function, procedure, parameters,
+    value;
+
+// GRAMATICA
+/*start with declaration_program;
+
+declaration_program ::=   RW_PROGRAM IDENTIFIER RW_BEGIN RW_END
+                        | RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN RW_END;
+
+optional_sections ::=     constants_section variables_section functions_section
+                        | constants_section
+                        | variables_section
+                        | functions_section
+                        | constants_section variables_section
+                        | variables_section functions_section
+                        | constants_section functions_section;
+
+
+// CONSTANTES
+constants_section ::= RW_CONST declarations_constants;
+
+declarations_constants ::=    declaration_constant
+                            | declaration_constant declarations_constants;
+
+declaration_constant ::=  IDENTIFIER:id OPB_EQUAL value OP_SEMI
+                        | error:e {:
+                                    parser.errores.add("Error en declaración de constante"+e);
+                                    parser.report_error("Error en declaración de constante",e);
+                                :};
+*/
+// VARIABLES
+variables_section ::= RW_VAR declarations_variables;
+
+declarations_variables ::=    declaration_var
+                            | declaration_var declarations_variables;
+
+declaration_var ::=   IDENTIFIER OP_TWOPOINTS DATA_TYPE OP_SEMI
+                    | IDENTIFIER OP_COMMA declaration_var
+                    | error:e {:
+                                parser.errores.add("Error en declaración de variable");
+                                parser.report_error("Error en declaración de variable",e);
+                            :};
+
+// FUNCIONES
+/*functions_section ::=   function
+                      | procedure
+                      | function functions_section
+                      | procedure functions_section;
+
+function ::=    RW_FUNCTION IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
+                RW_BEGIN IDENTIFIER:id_return OP_TWOPOINTSEGUAL value RW_END
+                {:
+                    if(id.equals(id_return)){
+                        parser.errores.add("Error porque ID de funcion y ID de retorno distintos");
+                        parser.report_error("Error porque ID de funcion y ID de retorno distintos",id_return);
+                    }
+                :};
+
+procedure ::=   RW_PROCEDURE IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
+                RW_BEGIN IDENTIFIER:id_return OP_TWOPOINTSEGUAL value RW_END
+                {:
+                    if(id.equals(id_return)){
+                        parser.errores.add("Error porque ID de proc y ID de retorno distintos");
+                        parser.report_error("Error porque ID de proc y ID de retorno distintos",id_return);
+                    }
+                :};
+
+parameters ::=    DATA_TYPE IDENTIFIER
+                | DATA_TYPE IDENTIFIER OP_COMMA parameters
+                | error:e {:
+                            parser.errores.add("Error en los parametros de funccion o proc");
+                            parser.report_error("Error en los parametros de funccion o proc",e);
+                        :};
+
+value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;*/

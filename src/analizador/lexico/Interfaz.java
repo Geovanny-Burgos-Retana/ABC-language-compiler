@@ -220,10 +220,22 @@ public class Interfaz extends javax.swing.JFrame {
                 File archViejo = new File(nuevoDir);
                 archViejo.delete();
             }
-                
+
             //generar el nuevo archivo java a partir del flex
-            String[] flex = {"src/analizador/lexico/Lexer.flex"};            
+            String[] flex = {"src/analizador/lexico/Lexer.flex"};
             jflex.Main.main(flex);
+            String archSintactico = "/home/geovanny/ABC-language-compiler/src/analizador/lexico/Parser.cup";
+            String[] asintactico = {"-parser", "AnalizadorSintactico", archSintactico};
+            try {
+                java_cup.Main.main(asintactico);
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            boolean mvAS = moverArch("AnalizadorSintactico.java");
+            boolean mvSym = moverArch("sym.java");
+            if (mvAS && mvSym) {
+                System.out.println("Generado!");
+            }
             labelJFlex.setText("Archivo Flex cargado con exito.");
         } catch (Exception e) {
             labelJFlex.setText("Error: Archivo Flex no se pudo cargar");
@@ -238,19 +250,31 @@ public class Interfaz extends javax.swing.JFrame {
             int returnVal = chooser.showOpenDialog(null);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 String entrada = chooser.getSelectedFile().getPath();
-                BufferedReader bf = null;
+                System.out.println(entrada);
+                try {
+                    LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(entrada));
+                    AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+                    Object result = asin.parse().value;
+                    //System.out.println(scanner.toStringErrores());
+                    //asin.imprimirErrores();
+                    System.out.println("\n*** Resultados finales ***");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                /*BufferedReader bf = null;
                 try {
                     //llamar a los tokens uno por uno, con la funcion nexttoken
                     bf = new BufferedReader(new FileReader(entrada));
-                    LexerAnalyzer a = new LexerAnalyzer(bf);
-                    Yytoken token = null;
+                    //LexerAnalyzer a = new LexerAnalyzer(bf);
+                    //Yytoken token = null;
                     do {
-                        token = a.nextToken();                        
+                        //token = a.nextToken();
                     } while (token != null);
-                    
+
                     taTokens.setText(a.toStringTokens());
                     taErrores.setText(a.toStringErrores());
-                    
+
                 } catch (Exception ex) {
                     Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                 } finally {
@@ -259,7 +283,7 @@ public class Interfaz extends javax.swing.JFrame {
                     } catch (IOException ex) {
                         Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                }
+                }*/
             }
             labelDir.setText("Archivo .txt cargado correctamente");
             //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
@@ -326,4 +350,30 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JTextArea taErrores;
     private javax.swing.JTextArea taTokens;
     // End of variables declaration//GEN-END:variables
+
+    public static boolean moverArch(String archNombre) {
+        boolean efectuado = false;
+        File arch = new File(archNombre);
+        if (arch.exists()) {
+            System.out.println("\n*** Moviendo " + arch + " \n***");
+            Path currentRelativePath = Paths.get("");
+            String nuevoDir = currentRelativePath.toAbsolutePath().toString()
+                    + File.separator + "src" + File.separator
+                    + "analizador" + File.separator
+                    + "lexico" + File.separator + arch.getName();
+            File archViejo = new File(nuevoDir);
+            archViejo.delete();
+            if (arch.renameTo(new File(nuevoDir))) {
+                System.out.println("\n*** Generado " + archNombre + "***\n");
+                efectuado = true;
+            } else {
+                System.out.println("\n*** No movido " + archNombre + " ***\n");
+            }
+
+        } else {
+            System.out.println("\n*** Codigo no existente ***\n");
+        }
+        return efectuado;
+    }
+
 }
