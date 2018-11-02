@@ -6,8 +6,8 @@
 package analizador.lexico;
 
 /**
- *
- * @author geovanny
+ * Desarrollado por: Francisco Monge (2013039434) y Geovanny Burgos (2015121963)
+ * Instituto Tecnológico de Costa Rica - Ingeniería en Computación
  */
 public class AnalizadorLexico {
 
