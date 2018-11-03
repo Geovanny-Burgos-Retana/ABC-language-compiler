@@ -255,6 +255,8 @@ public class Interfaz extends javax.swing.JFrame {
                     LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(entrada));
                     AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
                     Object result = asin.parse().value;
+                    taTokens.setText(scanner.toStringTokens());
+                    taErrores.setText(scanner.toStringErrores());
                     //System.out.println(scanner.toStringErrores());
                     //asin.imprimirErrores();
                     System.out.println("\n*** Resultados finales ***");
