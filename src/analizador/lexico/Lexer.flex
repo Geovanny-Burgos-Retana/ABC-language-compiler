@@ -189,7 +189,7 @@ CommentBlock2Wrong = "(""*"([^"*)"]|{WHITE})* | "{"([^"}"]|{WHITE})*
 LineTerminator = \r|\n|\r\n
 Space = " "
 Tabulator = \t
-Data_Type = "BOOLEAN" | "CHAR" | ("INT" | "int") | "LONGINT" | "REAL" | "SHORTINT" | "STRING"
+Data_Type = ("BOOLEAN"|"boolean") | ("CHAR"|"char") | ("INT"|"int") | ("LONGINT"|"longint") | ("REAL"|"real") | ("SHORTINT"|"shortint") | ("STRING"|"string")
 Scientific_Notation = [0-9]*\.[0-9]+([e|E][-+]{0,1}[0-9]+)
 Real_Number = [0-9]+"."[0-9]+
 IdentifierWrong = [A-Za-z][A-Za-z0-9]{127,500}  //500 es un valor fijo, se puede variar segun necesidad, sin embargo ente mas grande sea, mas estados requiere, haciendolo mas lento.
@@ -236,86 +236,108 @@ Error = [^]
     }
 
     // PALABRAS RESERVADAS -------------- 9 ----------------------------------
-    "BEGIN" {
+    ("BEGIN" | "begin") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_BEGIN, yytext());
     }
-    "CONST" {
+    ("CONST" | "const") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_CONST, yytext());
     }
-    "DO" {
+    ("DO" | "do") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_DO, yytext());
     }
-    "ELSE" {
+    ("ELSE" | "else") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_ELSE, yytext());
     }
-    "END" {
+    ("END" | "end") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_END, yytext());
     }
-    "FALSE" {
+    ("FALSE" | "false") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_FALSE, yytext());
     }
-    "FOR" {
+    ("FOR" | "for") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_FOR, yytext());
     }
-    "FUNCTION" {
+    ("FUNCTION" | "function") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_FUNCTION, yytext());
     }
-    "IF" {
+    ("IF" | "if") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_IF, yytext());
     }
-    "OF" {
+    ("OF" | "of") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_OF, yytext());
     }
-    "PROCEDURE" {
+    ("PROCEDURE" | "procedure") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_PROCEDURE, yytext());
     }
-    "PROGRAM" {
+    ("PROGRAM" | "program") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_PROGRAM, yytext());
     }
-    "READ" {
+    ("READ" | "read") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_READ, yytext());
     }
-    "THEN" {
+    ("THEN" | "then") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_THEN, yytext());
     }
-    "TO" {
+    ("TO" | "to") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_TO, yytext());
     }
-    "TRUE" {
+    ("TRUE" | "true") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_TRUE, yytext());
     }
-    "UNTIL" {
+    ("UNTIL" | "until") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_UNTIL, yytext());
     }
-    "VAR" {
+    ("VAR" | "var") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_VAR, yytext());
     }
-    "WHILE" {
+    ("WHILE" | "while") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_WHITE, yytext());
     }
-    "WRITE" {
+    ("WRITE" | "write") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
         return symbol(sym.RW_WRITE, yytext());
     }
+    // PALABRAS RESERVADAS OPERADORES -----------------------------------------
+    ("MOD" | "mod") {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
+        return symbol(sym.OP_MOD, yytext());
+    }
+    ("OR" | "or") {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
+        return symbol(sym.OPB_OR, yytext());
+    }
+    ("AND" | "and") {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
+        return symbol(sym.OPB_AND, yytext());
+    }
+    ("NOT" | "not") {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
+        return symbol(sym.OPB_NOT, yytext());
+    }
+    ("DIV" | "div") {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
+        return symbol(sym.OP_DIV, yytext());
+    }
+
     // ---------------------------------- 10 ----------------------------------
     {Data_Type} {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
@@ -370,9 +392,11 @@ Error = [^]
 
     // OPERADORES ARITMETICOS ----------- 19 ----------------------------------
     "," {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OP_COMMA);
     }
-    ";" { 
+    ";" {
+        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OP_SEMI); 
     }
     ":" {
@@ -406,11 +430,7 @@ Error = [^]
     "/" {
         addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OP_DIVIDE);
-    }
-    "MOD" {
-        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
-        return symbol(sym.OP_MOD, yytext());
-    }
+    }    
     "(" {
         addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OP_LEFTPARENTHESIS);
@@ -434,10 +454,6 @@ Error = [^]
     "/=" {
         addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OP_DIVEQUAL);
-    }
-    "DIV" {
-        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
-        return symbol(sym.OP_DIV, yytext());
     }
        
     // OPERADORES BOOLEANOS ------------ 12 ----------------------------------
@@ -464,18 +480,6 @@ Error = [^]
     "<>" {
         addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
         return symbol(sym.OPB_DIFERENT);
-    }
-    "OR" {
-        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
-        return symbol(sym.OPB_OR, yytext());
-    }
-    "AND" {
-        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
-        return symbol(sym.OPB_AND, yytext());
-    }
-    "NOT" {
-        addToken(new Yytoken(count, yytext(), Types_Tokens.OPERADOR), yyline);
-        return symbol(sym.OPB_NOT, yytext());
     }
 
     // --------------------------------- 13 ----------------------------------
