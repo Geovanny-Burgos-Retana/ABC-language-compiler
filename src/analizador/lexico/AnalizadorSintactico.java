@@ -33,8 +33,8 @@ public class AnalizadorSintactico extends java_cup.runtime.lr_parser {
   /** Production table. */
   protected static final short _production_table[][] = 
     unpackFromStrings(new String[] {
-    "\000\044\000\002\002\004\000\002\002\006\000\002\002" +
-    "\007\000\002\002\003\000\002\003\005\000\002\003\003" +
+    "\000\100\000\002\002\004\000\002\002\007\000\002\002" +
+    "\010\000\002\002\003\000\002\003\005\000\002\003\003" +
     "\000\002\003\003\000\002\003\003\000\002\003\004\000" +
     "\002\003\004\000\002\003\004\000\002\004\004\000\002" +
     "\005\003\000\002\005\004\000\002\006\006\000\002\006" +
@@ -44,7 +44,15 @@ public class AnalizadorSintactico extends java_cup.runtime.lr_parser {
     "\012\004\000\002\013\016\000\002\014\014\000\002\015" +
     "\004\000\002\015\006\000\002\015\004\000\002\016\003" +
     "\000\002\016\003\000\002\016\003\000\002\016\003\000" +
-    "\002\016\003" });
+    "\002\016\003\000\002\017\004\000\002\020\003\000\002" +
+    "\020\003\000\002\021\012\000\002\021\010\000\002\022" +
+    "\003\000\002\022\003\000\002\022\011\000\002\022\003" +
+    "\000\002\022\003\000\002\022\003\000\002\025\004\000" +
+    "\002\025\006\000\002\023\005\000\002\024\003\000\002" +
+    "\024\003\000\002\024\003\000\002\026\003\000\002\026" +
+    "\003\000\002\026\003\000\002\026\003\000\002\026\003" +
+    "\000\002\026\003\000\002\026\003\000\002\026\003\000" +
+    "\002\026\003\000\002\027\004\000\002\030\003" });
 
   /** Access to production table. */
   public short[][] production_table() {return _production_table;}
@@ -52,55 +60,94 @@ public class AnalizadorSintactico extends java_cup.runtime.lr_parser {
   /** Parse-action table. */
   protected static final short[][] _action_table = 
     unpackFromStrings(new String[] {
-    "\000\114\000\006\003\004\020\005\001\002\000\004\002" +
-    "\ufffe\001\002\000\004\064\010\001\002\000\004\002\007" +
+    "\000\202\000\006\003\004\020\005\001\002\000\004\002" +
+    "\ufffe\001\002\000\004\065\010\001\002\000\004\002\007" +
     "\001\002\000\004\002\001\001\002\000\014\005\016\006" +
-    "\021\014\011\017\014\026\015\001\002\000\004\064\104" +
+    "\021\014\011\017\014\026\015\001\002\000\004\065\172" +
     "\001\002\000\010\005\uffea\014\011\017\014\001\002\000" +
-    "\004\005\ufffa\001\002\000\004\064\064\001\002\000\006" +
-    "\003\053\064\054\001\002\000\004\011\051\001\002\000" +
-    "\012\005\ufffc\014\011\017\014\026\015\001\002\000\010" +
-    "\005\uffeb\014\011\017\014\001\002\000\004\064\030\001" +
-    "\002\000\004\005\025\001\002\000\010\005\ufffb\014\011" +
-    "\017\014\001\002\000\004\005\ufff7\001\002\000\004\011" +
-    "\026\001\002\000\004\002\uffff\001\002\000\012\005\ufff6" +
-    "\014\ufff6\017\ufff6\026\ufff6\001\002\000\006\003\033\053" +
-    "\034\001\002\000\014\005\ufff5\014\ufff5\017\ufff5\026\ufff5" +
-    "\064\030\001\002\000\012\005\ufff4\014\ufff4\017\ufff4\026" +
-    "\ufff4\001\002\000\004\051\044\001\002\000\014\065\041" +
-    "\066\035\067\036\070\040\071\042\001\002\000\006\011" +
-    "\uffe1\051\uffe1\001\002\000\006\011\uffe0\051\uffe0\001\002" +
-    "\000\004\051\043\001\002\000\006\011\uffdf\051\uffdf\001" +
-    "\002\000\006\011\uffe2\051\uffe2\001\002\000\006\011\uffde" +
-    "\051\uffde\001\002\000\014\005\ufff3\014\ufff3\017\ufff3\026" +
-    "\ufff3\064\ufff3\001\002\000\014\005\ufff2\014\ufff2\017\ufff2" +
-    "\026\ufff2\064\ufff2\001\002\000\004\005\uffe9\001\002\000" +
-    "\010\005\ufff9\014\011\017\014\001\002\000\004\005\ufff8" +
-    "\001\002\000\004\005\ufffd\001\002\000\004\002\000\001" +
-    "\002\000\014\003\053\005\ufff0\014\ufff0\017\ufff0\064\054" +
-    "\001\002\000\014\003\uffec\005\uffec\014\uffec\017\uffec\064" +
-    "\uffec\001\002\000\006\050\057\052\056\001\002\000\010" +
-    "\005\ufff1\014\ufff1\017\ufff1\001\002\000\004\004\061\001" +
-    "\002\000\006\003\053\064\054\001\002\000\014\003\uffed" +
-    "\005\uffed\014\uffed\017\uffed\064\uffed\001\002\000\004\051" +
-    "\062\001\002\000\014\003\uffee\005\uffee\014\uffee\017\uffee" +
-    "\064\uffee\001\002\000\010\005\uffef\014\uffef\017\uffef\001" +
-    "\002\000\004\041\065\001\002\000\006\003\067\004\066" +
-    "\001\002\000\004\064\100\001\002\000\004\042\077\001" +
-    "\002\000\004\042\071\001\002\000\004\005\072\001\002" +
-    "\000\004\064\073\001\002\000\004\033\074\001\002\000" +
-    "\014\065\041\066\035\067\036\070\040\071\042\001\002" +
-    "\000\004\011\076\001\002\000\010\005\uffe6\014\uffe6\017" +
-    "\uffe6\001\002\000\004\042\uffe3\001\002\000\006\042\uffe5" +
-    "\050\101\001\002\000\006\003\067\004\066\001\002\000" +
-    "\004\042\uffe4\001\002\000\004\005\uffe8\001\002\000\004" +
-    "\041\105\001\002\000\006\003\067\004\066\001\002\000" +
-    "\004\042\107\001\002\000\004\052\110\001\002\000\004" +
-    "\004\111\001\002\000\004\005\112\001\002\000\004\064" +
-    "\113\001\002\000\004\033\114\001\002\000\014\065\041" +
-    "\066\035\067\036\070\040\071\042\001\002\000\004\011" +
-    "\116\001\002\000\010\005\uffe7\014\uffe7\017\uffe7\001\002" +
-    "" });
+    "\004\005\ufffa\001\002\000\004\065\152\001\002\000\006" +
+    "\003\141\065\142\001\002\000\006\003\027\027\030\001" +
+    "\002\000\012\005\ufffc\014\011\017\014\026\015\001\002" +
+    "\000\010\005\uffeb\014\011\017\014\001\002\000\004\065" +
+    "\115\001\002\000\004\005\025\001\002\000\010\005\ufffb" +
+    "\014\011\017\014\001\002\000\004\005\ufff7\001\002\000" +
+    "\006\003\027\027\030\001\002\000\004\011\113\001\002" +
+    "\000\006\003\uffdb\027\uffdb\001\002\000\006\003\034\042" +
+    "\035\001\002\000\006\003\027\027\030\001\002\000\006" +
+    "\003\uffdc\027\uffdc\001\002\000\004\011\uffdd\001\002\000" +
+    "\004\007\107\001\002\000\022\003\044\012\036\024\042" +
+    "\042\040\064\043\065\046\066\041\067\045\001\002\000" +
+    "\004\043\uffd4\001\002\000\004\043\077\001\002\000\010" +
+    "\065\046\066\041\067\045\001\002\000\026\043\uffce\054" +
+    "\uffce\055\uffce\056\uffce\057\uffce\060\uffce\061\uffce\062\uffce" +
+    "\063\uffce\064\uffce\001\002\000\004\043\uffd5\001\002\000" +
+    "\006\042\066\065\065\001\002\000\004\043\uffd3\001\002" +
+    "\000\026\043\uffcd\054\uffcd\055\uffcd\056\uffcd\057\uffcd\060" +
+    "\uffcd\061\uffcd\062\uffcd\063\uffcd\064\uffcd\001\002\000\026" +
+    "\043\uffcf\054\uffcf\055\uffcf\056\uffcf\057\uffcf\060\uffcf\061" +
+    "\uffcf\062\uffcf\063\uffcf\064\uffcf\001\002\000\004\043\uffd7" +
+    "\001\002\000\024\054\053\055\054\056\052\057\061\060" +
+    "\063\061\062\062\057\063\060\064\056\001\002\000\004" +
+    "\043\uffd8\001\002\000\012\042\uffca\065\uffca\066\uffca\067" +
+    "\uffca\001\002\000\012\042\uffcc\065\uffcc\066\uffcc\067\uffcc" +
+    "\001\002\000\012\042\uffcb\065\uffcb\066\uffcb\067\uffcb\001" +
+    "\002\000\010\065\046\066\041\067\045\001\002\000\012" +
+    "\042\uffc4\065\uffc4\066\uffc4\067\uffc4\001\002\000\012\042" +
+    "\uffc6\065\uffc6\066\uffc6\067\uffc6\001\002\000\012\042\uffc5" +
+    "\065\uffc5\066\uffc5\067\uffc5\001\002\000\012\042\uffc9\065" +
+    "\uffc9\066\uffc9\067\uffc9\001\002\000\012\042\uffc7\065\uffc7" +
+    "\066\uffc7\067\uffc7\001\002\000\012\042\uffc8\065\uffc8\066" +
+    "\uffc8\067\uffc8\001\002\000\004\043\uffd0\001\002\000\004" +
+    "\043\uffd2\001\002\000\010\065\046\066\041\067\045\001" +
+    "\002\000\004\043\070\001\002\000\004\043\uffd1\001\002" +
+    "\000\004\043\072\001\002\000\024\054\053\055\054\056" +
+    "\052\057\061\060\063\061\062\062\057\063\060\064\056" +
+    "\001\002\000\004\042\074\001\002\000\010\065\046\066" +
+    "\041\067\045\001\002\000\004\043\076\001\002\000\004" +
+    "\043\uffd6\001\002\000\004\007\100\001\002\000\004\005" +
+    "\101\001\002\000\004\027\030\001\002\000\004\027\uffc2" +
+    "\001\002\000\004\027\030\001\002\000\004\011\105\001" +
+    "\002\000\006\003\uffda\027\uffda\001\002\000\004\011\uffc3" +
+    "\001\002\000\004\005\110\001\002\000\004\027\030\001" +
+    "\002\000\004\011\112\001\002\000\006\003\uffd9\027\uffd9" +
+    "\001\002\000\004\002\uffff\001\002\000\012\005\ufff6\014" +
+    "\ufff6\017\ufff6\026\ufff6\001\002\000\006\003\120\054\121" +
+    "\001\002\000\014\005\ufff5\014\ufff5\017\ufff5\026\ufff5\065" +
+    "\115\001\002\000\012\005\ufff4\014\ufff4\017\ufff4\026\ufff4" +
+    "\001\002\000\004\052\131\001\002\000\014\066\126\067" +
+    "\122\070\123\071\125\072\127\001\002\000\006\011\uffe1" +
+    "\052\uffe1\001\002\000\006\011\uffe0\052\uffe0\001\002\000" +
+    "\004\052\130\001\002\000\006\011\uffdf\052\uffdf\001\002" +
+    "\000\006\011\uffe2\052\uffe2\001\002\000\006\011\uffde\052" +
+    "\uffde\001\002\000\014\005\ufff3\014\ufff3\017\ufff3\026\ufff3" +
+    "\065\ufff3\001\002\000\014\005\ufff2\014\ufff2\017\ufff2\026" +
+    "\ufff2\065\ufff2\001\002\000\004\005\uffe9\001\002\000\010" +
+    "\005\ufff9\014\011\017\014\001\002\000\004\005\ufff8\001" +
+    "\002\000\004\005\ufffd\001\002\000\004\011\137\001\002" +
+    "\000\004\002\000\001\002\000\014\003\141\005\ufff0\014" +
+    "\ufff0\017\ufff0\065\142\001\002\000\014\003\uffec\005\uffec" +
+    "\014\uffec\017\uffec\065\uffec\001\002\000\006\051\145\053" +
+    "\144\001\002\000\010\005\ufff1\014\ufff1\017\ufff1\001\002" +
+    "\000\004\004\147\001\002\000\006\003\141\065\142\001" +
+    "\002\000\014\003\uffed\005\uffed\014\uffed\017\uffed\065\uffed" +
+    "\001\002\000\004\052\150\001\002\000\014\003\uffee\005" +
+    "\uffee\014\uffee\017\uffee\065\uffee\001\002\000\010\005\uffef" +
+    "\014\uffef\017\uffef\001\002\000\004\042\153\001\002\000" +
+    "\006\003\155\004\154\001\002\000\004\065\166\001\002" +
+    "\000\004\043\165\001\002\000\004\043\157\001\002\000" +
+    "\004\005\160\001\002\000\004\065\161\001\002\000\004" +
+    "\034\162\001\002\000\014\066\126\067\122\070\123\071" +
+    "\125\072\127\001\002\000\004\011\164\001\002\000\010" +
+    "\005\uffe6\014\uffe6\017\uffe6\001\002\000\004\043\uffe3\001" +
+    "\002\000\006\043\uffe5\051\167\001\002\000\006\003\155" +
+    "\004\154\001\002\000\004\043\uffe4\001\002\000\004\005" +
+    "\uffe8\001\002\000\004\042\173\001\002\000\006\003\155" +
+    "\004\154\001\002\000\004\043\175\001\002\000\004\053" +
+    "\176\001\002\000\004\004\177\001\002\000\004\005\200" +
+    "\001\002\000\004\065\201\001\002\000\004\034\202\001" +
+    "\002\000\014\066\126\067\122\070\123\071\125\072\127" +
+    "\001\002\000\004\011\204\001\002\000\010\005\uffe7\014" +
+    "\uffe7\017\uffe7\001\002" });
 
   /** Access to parse-action table. */
   public short[][] action_table() {return _action_table;}
@@ -108,36 +155,57 @@ public class AnalizadorSintactico extends java_cup.runtime.lr_parser {
   /** <code>reduce_goto</code> table. */
   protected static final short[][] _reduce_table = 
     unpackFromStrings(new String[] {
-    "\000\114\000\004\002\005\001\001\000\002\001\001\000" +
+    "\000\202\000\004\002\005\001\001\000\002\001\001\000" +
     "\002\001\001\000\002\001\001\000\002\001\001\000\016" +
     "\003\021\004\016\007\022\012\012\013\017\014\011\001" +
-    "\001\000\002\001\001\000\010\012\102\013\017\014\011" +
+    "\001\000\002\001\001\000\010\012\170\013\017\014\011" +
     "\001\001\000\002\001\001\000\002\001\001\000\006\010" +
-    "\054\011\051\001\001\000\002\001\001\000\012\007\045" +
-    "\012\046\013\017\014\011\001\001\000\010\012\044\013" +
-    "\017\014\011\001\001\000\006\005\026\006\030\001\001" +
-    "\000\002\001\001\000\010\012\023\013\017\014\011\001" +
-    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\006\005\031\006" +
-    "\030\001\001\000\002\001\001\000\002\001\001\000\004" +
-    "\016\036\001\001\000\002\001\001\000\002\001\001\000" +
-    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
-    "\001\000\010\012\047\013\017\014\011\001\001\000\002" +
-    "\001\001\000\002\001\001\000\002\001\001\000\006\010" +
-    "\062\011\051\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\004\011\057\001" +
-    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\004\015\067\001" +
-    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
+    "\142\011\137\001\001\000\010\017\135\020\030\021\031" +
+    "\001\001\000\012\007\132\012\133\013\017\014\011\001" +
+    "\001\000\010\012\131\013\017\014\011\001\001\000\006" +
+    "\005\113\006\115\001\001\000\002\001\001\000\010\012" +
+    "\023\013\017\014\011\001\001\000\002\001\001\000\010" +
+    "\017\025\020\030\021\031\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\010\017\032\020\030" +
+    "\021\031\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\012\022\036\023\050\024\047\025\046" +
+    "\001\001\000\002\001\001\000\002\001\001\000\006\023" +
+    "\070\024\047\001\001\000\002\001\001\000\002\001\001" +
     "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
-    "\004\016\074\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\002\001\001\000\004\015\101\001" +
+    "\002\001\001\000\002\001\001\000\004\026\054\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\004\024\063\001\001\000\002\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\006\023\066\024\047\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\004\026\072" +
+    "\001\001\000\002\001\001\000\006\023\074\024\047\001" +
     "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\004\015\105\001\001\000\002\001\001\000\002\001" +
+    "\000\002\001\001\000\010\021\101\027\103\030\102\001" +
+    "\001\000\002\001\001\000\010\021\101\027\105\030\102" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\010\021\101\027\110\030\102" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\006\005\116" +
+    "\006\115\001\001\000\002\001\001\000\002\001\001\000" +
+    "\004\016\123\001\001\000\002\001\001\000\002\001\001" +
+    "\000\002\001\001\000\002\001\001\000\002\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\010\012\134\013\017\014\011\001\001\000" +
+    "\002\001\001\000\002\001\001\000\002\001\001\000\002" +
+    "\001\001\000\006\010\150\011\137\001\001\000\002\001" +
     "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
-    "\000\002\001\001\000\004\016\114\001\001\000\002\001" +
-    "\001\000\002\001\001" });
+    "\000\004\011\145\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
+    "\000\004\015\155\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
+    "\000\002\001\001\000\004\016\162\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\002\001\001" +
+    "\000\004\015\167\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\004\015\173\001\001\000\002" +
+    "\001\001\000\002\001\001\000\002\001\001\000\002\001" +
+    "\001\000\002\001\001\000\002\001\001\000\004\016\202" +
+    "\001\001\000\002\001\001\000\002\001\001" });
 
   /** Access to <code>reduce_goto</code> table. */
   public short[][] reduce_table() {return _reduce_table;}
@@ -280,20 +348,20 @@ class CUP$AnalizadorSintactico$actions {
           return CUP$AnalizadorSintactico$result;
 
           /*. . . . . . . . . . . . . . . . . . . .*/
-          case 1: // declaration_program ::= RW_PROGRAM IDENTIFIER RW_BEGIN RW_END 
-            {
-              Object RESULT =null;
-
-              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("declaration_program",0, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-3)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
-            }
-          return CUP$AnalizadorSintactico$result;
-
-          /*. . . . . . . . . . . . . . . . . . . .*/
-          case 2: // declaration_program ::= RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN RW_END 
+          case 1: // declaration_program ::= RW_PROGRAM IDENTIFIER RW_BEGIN seccion_instrucciones RW_END 
             {
               Object RESULT =null;
 
               CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("declaration_program",0, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-4)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 2: // declaration_program ::= RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN seccion_instrucciones RW_END 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("declaration_program",0, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-5)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
             }
           return CUP$AnalizadorSintactico$result;
 
@@ -641,6 +709,276 @@ class CUP$AnalizadorSintactico$actions {
               Object RESULT =null;
 
               CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("value",12, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 36: // seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("seccion_instrucciones",13, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-1)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 37: // seccion_instrucciones1 ::= bloque_while 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("seccion_instrucciones1",14, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 38: // seccion_instrucciones1 ::= error 
+            {
+              Object RESULT =null;
+		int eleft = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).left;
+		int eright = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).right;
+		Object e = (Object)((java_cup.runtime.Symbol) CUP$AnalizadorSintactico$stack.peek()).value;
+		 
+            parser.errores.add("Error en el cuerpo de instrucciones");
+            parser.report_error("Error en el cuerpo de instrucciones",e);
+        
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("seccion_instrucciones1",14, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 39: // bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO RW_BEGIN cuerpo_estructura_control RW_END 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("bloque_while",15, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-7)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 40: // bloque_while ::= RW_WHILE error RW_DO RW_BEGIN cuerpo_estructura_control RW_END 
+            {
+              Object RESULT =null;
+		int eleft = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-4)).left;
+		int eright = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-4)).right;
+		Object e = (Object)((java_cup.runtime.Symbol) CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-4)).value;
+		 
+            parser.errores.add("Falta expresión en While");
+            parser.report_error("Falta expresión en while",e);
+        
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("bloque_while",15, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-5)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 41: // condicion_booleana ::= condicion_booleana1 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 42: // condicion_booleana ::= condicion_not 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 43: // condicion_booleana ::= OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-6)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 44: // condicion_booleana ::= RW_TRUE 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 45: // condicion_booleana ::= RW_FALSE 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 46: // condicion_booleana ::= error 
+            {
+              Object RESULT =null;
+		int eleft = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).left;
+		int eright = ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()).right;
+		Object e = (Object)((java_cup.runtime.Symbol) CUP$AnalizadorSintactico$stack.peek()).value;
+		 
+            parser.errores.add("Error en condición booleana");
+            parser.report_error("Error en condición booleana",e);
+        
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana",16, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 47: // condicion_not ::= OPB_NOT IDENTIFIER 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_not",19, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-1)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 48: // condicion_not ::= OPB_NOT OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_not",19, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-3)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 49: // condicion_booleana1 ::= condicion_booleana2 operador_booleano condicion_booleana2 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana1",17, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-2)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 50: // condicion_booleana2 ::= IDENTIFIER 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana2",18, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 51: // condicion_booleana2 ::= ENTERO 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana2",18, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 52: // condicion_booleana2 ::= REAL 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("condicion_booleana2",18, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 53: // operador_booleano ::= OPB_EQUAL 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 54: // operador_booleano ::= OPB_GREATEREQUAL 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 55: // operador_booleano ::= OPB_GREATER 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 56: // operador_booleano ::= OPB_LESSEQUAL 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 57: // operador_booleano ::= OPB_LESS 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 58: // operador_booleano ::= OPB_DIFERENT 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 59: // operador_booleano ::= OPB_OR 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 60: // operador_booleano ::= OPB_AND 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 61: // operador_booleano ::= OPB_NOT 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("operador_booleano",20, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 62: // cuerpo_estructura_control ::= cuerpo_estructura_control1 cuerpo_estructura_control 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("cuerpo_estructura_control",21, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.elementAt(CUP$AnalizadorSintactico$top-1)), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
+            }
+          return CUP$AnalizadorSintactico$result;
+
+          /*. . . . . . . . . . . . . . . . . . . .*/
+          case 63: // cuerpo_estructura_control1 ::= bloque_while 
+            {
+              Object RESULT =null;
+
+              CUP$AnalizadorSintactico$result = parser.getSymbolFactory().newSymbol("cuerpo_estructura_control1",22, ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), ((java_cup.runtime.Symbol)CUP$AnalizadorSintactico$stack.peek()), RESULT);
             }
           return CUP$AnalizadorSintactico$result;
 

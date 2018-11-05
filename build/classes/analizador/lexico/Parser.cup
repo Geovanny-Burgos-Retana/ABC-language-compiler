@@ -77,7 +77,7 @@ terminal
     // PALABRAS RESERVADAS
     RW_BEGIN, RW_CONST, RW_DO, RW_ELSE, RW_END, RW_FALSE, RW_FOR,
     RW_FUNCTION, RW_IF, RW_OF, RW_PROCEDURE, RW_PROGRAM, RW_READ,
-    RW_THEN, RW_TO, RW_TRUE, RW_UNTIL, RW_VAR, RW_WHITE, RW_WRITE,
+    RW_THEN, RW_TO, RW_TRUE, RW_UNTIL, RW_VAR, RW_WHILE, RW_WHITE, RW_WRITE,
     // OPERADORES ARITMETICOS
     OP_PLUSPLUS, OP_LESSLESS, OP_TWOPOINTSEGUAL, OP_PLUS, OP_LESS,
     OP_MULTIPLY, OP_DIVIDE, OP_MOD, OP_LEFTPARENTHESIS, OP_RIGHTPARENTHESIS,
@@ -101,14 +101,17 @@ non terminal
     declaration_program, optional_sections,
     constants_section, declarations_constants, declaration_constant,
     variables_section, declarations_variables, declaration_var,
-    functions_section, function, procedure, parameters,
-    value;
+    functions_section, function, procedure, parameters, value,
+    seccion_instrucciones, seccion_instrucciones1,
+    bloque_while,
+    condicion_booleana, condicion_booleana1, condicion_booleana2, condicion_not, operador_booleano,
+    cuerpo_estructura_control, cuerpo_estructura_control1;
 
 // GRAMATICA
 start with declaration_program;
 
-declaration_program ::=   RW_PROGRAM IDENTIFIER RW_BEGIN RW_END
-                        | RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN RW_END
+declaration_program ::=   RW_PROGRAM IDENTIFIER RW_BEGIN seccion_instrucciones RW_END
+                        | RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN seccion_instrucciones RW_END
                         | error:e
                             {:
                                 parser.errores.add("Error en declaración bloques programa"+e);
@@ -192,3 +195,50 @@ parameters ::=    DATA_TYPE IDENTIFIER
 
 
 value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;
+
+
+//INSTRUCCIONES
+seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones;
+
+//AGREGAR bloque_if | bloque_for
+seccion_instrucciones1 ::= bloque_while 
+    | error:e 
+        {: 
+            parser.errores.add("Error en el cuerpo de instrucciones");
+            parser.report_error("Error en el cuerpo de instrucciones",e);
+        :}
+    ;
+
+//ESTRUCTURAS DE CONTROL
+bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
+    RW_BEGIN cuerpo_estructura_control RW_END
+    | RW_WHILE error:e RW_DO RW_BEGIN cuerpo_estructura_control RW_END
+        {: 
+            parser.errores.add("Falta expresión en While");
+            parser.report_error("Falta expresión en while",e);
+        :}
+    ;
+
+
+//UTILITARIAS
+condicion_booleana ::= condicion_booleana1 | condicion_not 
+    | OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS
+    | RW_TRUE | RW_FALSE
+    | error:e 
+        {: 
+            parser.errores.add("Error en condición booleana");
+            parser.report_error("Error en condición booleana",e);
+        :}
+    ;
+
+condicion_not ::= OPB_NOT IDENTIFIER | OPB_NOT OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS;
+
+condicion_booleana1 ::= condicion_booleana2 operador_booleano condicion_booleana2;
+
+condicion_booleana2 ::= IDENTIFIER | ENTERO | REAL;
+
+operador_booleano ::= OPB_EQUAL | OPB_GREATEREQUAL | OPB_GREATER | OPB_LESSEQUAL | OPB_LESS | OPB_DIFERENT | OPB_OR | OPB_AND | OPB_NOT;
+
+cuerpo_estructura_control ::= cuerpo_estructura_control1 cuerpo_estructura_control;
+
+cuerpo_estructura_control1 ::= bloque_while;

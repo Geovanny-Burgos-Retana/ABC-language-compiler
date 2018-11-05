@@ -118,7 +118,7 @@ public class Interfaz extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 0, 153));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("Analizador Léxico - Scanner");
+        jLabel9.setText("Analizador Léxico - Sintáctico");
         jLabel9.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         jLabel9.setAlignmentY(0.8F);
         jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -167,8 +167,8 @@ public class Interfaz extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(194, 194, 194))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(448, 448, 448)
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(418, 418, 418)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -224,7 +224,7 @@ public class Interfaz extends javax.swing.JFrame {
             //generar el nuevo archivo java a partir del flex
             String[] flex = {"src/analizador/lexico/Lexer.flex"};
             jflex.Main.main(flex);
-            String archSintactico = "/home/geovanny/ABC-language-compiler/src/analizador/lexico/Parser.cup";
+            String archSintactico = "C:/Users/FranM/OneDrive/Documentos/Git Repositorios/ABC-language-compiler/src/analizador/lexico/Parser.cup";
             String[] asintactico = {"-parser", "AnalizadorSintactico", archSintactico};
             try {
                 java_cup.Main.main(asintactico);
