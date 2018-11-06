@@ -310,7 +310,7 @@ Error = [^]
     }
     ("WHILE" | "while") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);
-        return symbol(sym.RW_WHITE, yytext());
+        return symbol(sym.RW_WHILE, yytext());
     }
     ("WRITE" | "write") {
         addToken(new Yytoken(count, yytext(), Types_Tokens.PALABRA_RESERVADA), yyline);

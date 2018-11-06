@@ -102,13 +102,11 @@ non terminal
     declaration_program, optional_sections,
     constants_section, declarations_constants, declaration_constant,
     variables_section, declarations_variables, declaration_var,
-    functions_section, function, procedure, parameters, parameters_list,
-    value;
-    functions_section, function, procedure, parameters, value,
+    functions_section, function, procedure, parameters, parameters_list, value,
     seccion_instrucciones, seccion_instrucciones1,
     bloque_while,
-    condicion_booleana, condicion_booleana1, condicion_booleana2, condicion_not, operador_booleano,
-    cuerpo_estructura_control, cuerpo_estructura_control1;
+    condicion_booleana, condicion_booleana1, condicion_booleana2, condicion_not, operador_booleano, operador_aritmetico,
+    cuerpo_estructura_control, cuerpo_estructura_control1, sentencia;
 
 precedence left OP_LEFTPARENTHESIS, OP_RIGHTPARENTHESIS;
 
@@ -309,10 +307,10 @@ value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;
 
 
 //INSTRUCCIONES
-seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones;
+seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | /*epsilon*/ ; 
 
-//AGREGAR bloque_if | bloque_for
-seccion_instrucciones1 ::= bloque_while 
+
+seccion_instrucciones1 ::= bloque_while /* | AGREGAR bloque_if | bloque_for */
     | error:e 
         {: 
             parser.errores.add("Error en el cuerpo de instrucciones");
@@ -322,13 +320,13 @@ seccion_instrucciones1 ::= bloque_while
 
 //ESTRUCTURAS DE CONTROL
 bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
-    RW_BEGIN cuerpo_estructura_control RW_END
-    | RW_WHILE error:e RW_DO RW_BEGIN cuerpo_estructura_control RW_END
-        {: 
-            parser.errores.add("Falta expresión en While");
-            parser.report_error("Falta expresión en while",e);
-        :}
-    ;
+        RW_BEGIN cuerpo_estructura_control RW_END
+        | RW_WHILE error:e RW_DO RW_BEGIN cuerpo_estructura_control RW_END
+            {: 
+                parser.errores.add("Falta expresión en while");
+                parser.report_error("Falta expresión en while", e);
+            :}
+        ;
 
 
 //UTILITARIAS
@@ -350,6 +348,20 @@ condicion_booleana2 ::= IDENTIFIER | ENTERO | REAL;
 
 operador_booleano ::= OPB_EQUAL | OPB_GREATEREQUAL | OPB_GREATER | OPB_LESSEQUAL | OPB_LESS | OPB_DIFERENT | OPB_OR | OPB_AND | OPB_NOT;
 
-cuerpo_estructura_control ::= cuerpo_estructura_control1 cuerpo_estructura_control;
+operador_aritmetico ::= OP_PLUSPLUS | OP_LESSLESS | OP_TWOPOINTSEGUAL | OP_PLUS | OP_LESS | OP_MULTIPLY | OP_DIVIDE | OP_MOD
+    | OP_LEFTPARENTHESIS | OP_RIGHTPARENTHESIS | OP_PLUSEQUAL | OP_LESSEQUAL | OP_MULTEQUAL | OP_DIVEQUAL | OP_DIV;
 
-cuerpo_estructura_control1 ::= bloque_while;
+cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_estructura_control;
+
+cuerpo_estructura_control1 ::=  bloque_while /* | bloque_if | bloque_for */ | sentencia OP_SEMI;
+
+sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
+        | IDENTIFIER OP_PLUSPLUS OP_SEMI
+        | IDENTIFIER OP_LESSLESS OP_SEMI
+        | IDENTIFIER OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
+        | IDENTIFIER error:e OP_SEMI
+            {: 
+                parser.errores.add("Error en sentencia");
+                parser.report_error("Error en sentencia",e);
+            :}
+        ;
