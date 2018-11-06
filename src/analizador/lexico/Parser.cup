@@ -303,7 +303,7 @@ parameters_list ::=   OP_COMMA DATA_TYPE IDENTIFIER
 
 
 
-value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;
+value ::= /*add idenfiticador*/ ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;
 
 
 //INSTRUCCIONES
@@ -321,10 +321,20 @@ seccion_instrucciones1 ::= bloque_while /* | AGREGAR bloque_if | bloque_for */
 //ESTRUCTURAS DE CONTROL
 bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
         RW_BEGIN cuerpo_estructura_control RW_END
-        | RW_WHILE error:e RW_DO RW_BEGIN cuerpo_estructura_control RW_END
+        | RW_WHILE error:e cuerpo_estructura_control RW_END
             {: 
                 parser.errores.add("Falta expresión en while");
                 parser.report_error("Falta expresión en while", e);
+            :}
+        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e cuerpo_estructura_control RW_END
+            {: 
+                parser.errores.add("ERROR: Falta do para el while" + e);
+                parser.report_error("ERROR: Falta do para el while", e);
+            :}
+        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO error:e cuerpo_estructura_control RW_END
+            {: 
+                parser.errores.add("ERROR: Falta begin para el while" + e);
+                parser.report_error("ERROR: Falta begin para el while", e);
             :}
         ;
 
@@ -353,7 +363,7 @@ operador_aritmetico ::= OP_PLUSPLUS | OP_LESSLESS | OP_TWOPOINTSEGUAL | OP_PLUS 
 
 cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_estructura_control;
 
-cuerpo_estructura_control1 ::=  bloque_while /* | bloque_if | bloque_for */ | sentencia OP_SEMI;
+cuerpo_estructura_control1 ::=  bloque_while /* | bloque_if | bloque_for */ | sentencia;
 
 sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
         | IDENTIFIER OP_PLUSPLUS OP_SEMI
