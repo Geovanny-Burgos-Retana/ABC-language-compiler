@@ -104,7 +104,7 @@ non terminal
     variables_section, declarations_variables, declaration_var,
     functions_section, function, procedure, parameters, parameters_list, value,
     seccion_instrucciones, seccion_instrucciones1,
-    bloque_while, bloque_if,
+    bloque_while, bloque_if, bloque_for,
     condicion_booleana, condicion_booleana1, condicion_booleana2, condicion_not, operador_booleano, operador_aritmetico,
     cuerpo_estructura_control, cuerpo_estructura_control1, sentencia;
 
@@ -310,7 +310,7 @@ value ::= /*add idenfiticador*/ ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LIN
 seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | /*epsilon*/ ; 
 
 
-seccion_instrucciones1 ::= bloque_while | bloque_if /* | bloque_for */
+seccion_instrucciones1 ::= bloque_while | bloque_if | bloque_for
     | error:e 
         {: 
             parser.errores.add("Error en el cuerpo de instrucciones");
@@ -355,9 +355,45 @@ bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW
         {: 
             parser.errores.add("Error: falta THEN en IF" + e);
             parser.report_error("Error: falta THEN en IF", e);
-        :}
-    
+        :}    
     ;
+
+ bloque_for ::= RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO RW_BEGIN cuerpo_estructura_control RW_END
+        | RW_FOR error:e OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
+            {: 
+                parser.errores.add("Error: en identificador en FOR" + e);
+                parser.report_error("Error: en identificador en FOR", e);
+            :}
+        | RW_FOR IDENTIFIER error:e ENTERO RW_TO ENTERO RW_DO
+            {: 
+                parser.errores.add("Error: en asignación en FOR" + e);
+                parser.report_error("Error: en asignación en FOR", e);
+            :}
+        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO error:e ENTERO RW_DO
+            {: 
+                parser.errores.add("Error: Falta TO en FOR" + e);
+                parser.report_error("Error: Falta TO en FOR", e);
+            :}
+        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO error:e RW_DO
+        RW_BEGIN cuerpo_estructura_control RW_END
+            {: 
+                System.out.println("ERROR ENTERO FOR");
+                parser.errores.add("Error: Falta entero en FOR" + e);
+                parser.report_error("Error: Falta entero en FOR", e);
+            :}
+        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO error:e
+        RW_BEGIN cuerpo_estructura_control RW_END
+            {: 
+                parser.errores.add("Error: Falta DO en FOR" + e);
+                parser.report_error("Error: Falta DO en FOR", e);
+            :}
+        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
+        error:e cuerpo_estructura_control RW_END
+            {: 
+                parser.errores.add("Error: Falta BEGIN en FOR" + e);
+                parser.report_error("Error: Falta BEGIN en FOR", e);
+            :}
+        ;
 
 //UTILITARIAS
 condicion_booleana ::= condicion_booleana1 | condicion_not 
@@ -383,7 +419,7 @@ operador_aritmetico ::= OP_PLUSPLUS | OP_LESSLESS | OP_TWOPOINTSEGUAL | OP_PLUS 
 
 cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_estructura_control;
 
-cuerpo_estructura_control1 ::=  bloque_while | bloque_if /*| bloque_for */ | sentencia;
+cuerpo_estructura_control1 ::=  bloque_while | bloque_if | bloque_for | sentencia;
 
 sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
         | IDENTIFIER OP_PLUSPLUS OP_SEMI
