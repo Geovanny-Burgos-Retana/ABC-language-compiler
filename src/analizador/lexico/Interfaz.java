@@ -7,6 +7,7 @@ package analizador.lexico;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -224,7 +225,7 @@ public class Interfaz extends javax.swing.JFrame {
             //generar el nuevo archivo java a partir del flex
             String[] flex = {"src/analizador/lexico/Lexer.flex"};
             jflex.Main.main(flex);
-            String archSintactico = "C:/Users/FranM/OneDrive/Documentos/Git Repositorios/ABC-language-compiler/src/analizador/lexico/Parser.cup";
+            String archSintactico = "C:\\Users\\gfran\\Desktop\\ABC-language-compiler\\src\\analizador\\lexico\\Parser.cup";
             String[] asintactico = {"-parser", "AnalizadorSintactico", archSintactico};
             try {
                 java_cup.Main.main(asintactico);
@@ -243,55 +244,71 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
+        String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
         try {
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
-            chooser.setFileFilter(filter);
-            int returnVal = chooser.showOpenDialog(null);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                String entrada = chooser.getSelectedFile().getPath();
-                System.out.println(entrada);
-                try {
-                    LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(entrada));
-                    AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
-                    Object result = asin.parse().value;
-                    taTokens.setText(scanner.toStringTokens());
-                    taErrores.setText(scanner.toStringErrores());
-                    //System.out.println(scanner.toStringErrores());
-                    //asin.imprimirErrores();
-                    System.out.println("\n*** Resultados finales ***");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-
-                /*BufferedReader bf = null;
-                try {
-                    //llamar a los tokens uno por uno, con la funcion nexttoken
-                    bf = new BufferedReader(new FileReader(entrada));
-                    //LexerAnalyzer a = new LexerAnalyzer(bf);
-                    //Yytoken token = null;
-                    do {
-                        //token = a.nextToken();
-                    } while (token != null);
-
-                    taTokens.setText(a.toStringTokens());
-                    taErrores.setText(a.toStringErrores());
-
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        bf.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }*/
-            }
-            labelDir.setText("Archivo .txt cargado correctamente");
-            //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
-        } catch (Exception e) {
-            labelDir.setText("Error: no se pudo cargar el archivo");
+                LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
+            AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+            Object result = asin.parse().value;
+            taTokens.setText(scanner.toStringTokens());
+            taErrores.setText(scanner.toStringErrores());
+            //System.out.println(scanner.toStringErrores());
+            //asin.imprimirErrores();
+            System.out.println("\n*** Resultados finales ***");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        try {
+//            JFileChooser chooser = new JFileChooser();
+//            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+//            chooser.setFileFilter(filter);
+//            int returnVal = chooser.showOpenDialog(null);
+//            if (returnVal == JFileChooser.APPROVE_OPTION) {
+//                String entrada = chooser.getSelectedFile().getPath();
+//                System.out.println(entrada);
+//                try {
+//                    String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
+//                    LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
+//                    AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+//                    Object result = asin.parse().value;
+//                    taTokens.setText(scanner.toStringTokens());
+//                    taErrores.setText(scanner.toStringErrores());
+//                    //System.out.println(scanner.toStringErrores());
+//                    //asin.imprimirErrores();
+//                    System.out.println("\n*** Resultados finales ***");
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+//
+//                /*BufferedReader bf = null;
+//                try {
+//                    //llamar a los tokens uno por uno, con la funcion nexttoken
+//                    bf = new BufferedReader(new FileReader(entrada));
+//                    //LexerAnalyzer a = new LexerAnalyzer(bf);
+//                    //Yytoken token = null;
+//                    do {
+//                        //token = a.nextToken();
+//                    } while (token != null);
+//
+//                    taTokens.setText(a.toStringTokens());
+//                    taErrores.setText(a.toStringErrores());
+//
+//                } catch (Exception ex) {
+//                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//                } finally {
+//                    try {
+//                        bf.close();
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }*/
+//            }
+//            labelDir.setText("Archivo .txt cargado correctamente");
+//            //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
+//        } catch (Exception e) {
+//            labelDir.setText("Error: no se pudo cargar el archivo");
+//        }
     }//GEN-LAST:event_btnArchivoActionPerformed
 
     /**
