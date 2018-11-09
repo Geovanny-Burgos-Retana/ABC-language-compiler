@@ -1,1 +1,5 @@
 /dist/
+/build/
+/src/analizador/lexico/AnalizadorSintactico.java
+/src/analizador/lexico/LexerAnalyzer.java
+/src/analizador/lexico/sym.java

@@ -7,6 +7,7 @@ package analizador.lexico;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -118,7 +119,7 @@ public class Interfaz extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Monotype Corsiva", 1, 24)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(0, 0, 153));
         jLabel9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel9.setText("Analizador Léxico - Scanner");
+        jLabel9.setText("Analizador Léxico - Sintáctico");
         jLabel9.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
         jLabel9.setAlignmentY(0.8F);
         jLabel9.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -167,8 +168,8 @@ public class Interfaz extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(194, 194, 194))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(448, 448, 448)
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 283, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(418, 418, 418)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -220,10 +221,22 @@ public class Interfaz extends javax.swing.JFrame {
                 File archViejo = new File(nuevoDir);
                 archViejo.delete();
             }
-                
+
             //generar el nuevo archivo java a partir del flex
-            String[] flex = {"src/analizador/lexico/Lexer.flex"};            
+            String[] flex = {"src/analizador/lexico/Lexer.flex"};
             jflex.Main.main(flex);
+            String archSintactico = "C:\\Users\\gfran\\Desktop\\ABC-language-compiler\\src\\analizador\\lexico\\Parser.cup";
+            String[] asintactico = {"-parser", "AnalizadorSintactico", archSintactico};
+            try {
+                java_cup.Main.main(asintactico);
+            } catch (Exception ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            boolean mvAS = moverArch("AnalizadorSintactico.java");
+            boolean mvSym = moverArch("sym.java");
+            if (mvAS && mvSym) {
+                System.out.println("Generado!");
+            }
             labelJFlex.setText("Archivo Flex cargado con exito.");
         } catch (Exception e) {
             labelJFlex.setText("Error: Archivo Flex no se pudo cargar");
@@ -231,41 +244,71 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
+        String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
         try {
-            JFileChooser chooser = new JFileChooser();
-            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
-            chooser.setFileFilter(filter);
-            int returnVal = chooser.showOpenDialog(null);
-            if (returnVal == JFileChooser.APPROVE_OPTION) {
-                String entrada = chooser.getSelectedFile().getPath();
-                BufferedReader bf = null;
-                try {
-                    //llamar a los tokens uno por uno, con la funcion nexttoken
-                    bf = new BufferedReader(new FileReader(entrada));
-                    LexerAnalyzer a = new LexerAnalyzer(bf);
-                    Yytoken token = null;
-                    do {
-                        token = a.nextToken();                        
-                    } while (token != null);
-                    
-                    taTokens.setText(a.toStringTokens());
-                    taErrores.setText(a.toStringErrores());
-                    
-                } catch (Exception ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                } finally {
-                    try {
-                        bf.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-            labelDir.setText("Archivo .txt cargado correctamente");
-            //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
-        } catch (Exception e) {
-            labelDir.setText("Error: no se pudo cargar el archivo");
+                LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
+            AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+            Object result = asin.parse().value;
+            taTokens.setText(scanner.toStringTokens());
+            taErrores.setText(scanner.toStringErrores());
+            //System.out.println(scanner.toStringErrores());
+            //asin.imprimirErrores();
+            System.out.println("\n*** Resultados finales ***");
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
+//        try {
+//            JFileChooser chooser = new JFileChooser();
+//            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");
+//            chooser.setFileFilter(filter);
+//            int returnVal = chooser.showOpenDialog(null);
+//            if (returnVal == JFileChooser.APPROVE_OPTION) {
+//                String entrada = chooser.getSelectedFile().getPath();
+//                System.out.println(entrada);
+//                try {
+//                    String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
+//                    LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
+//                    AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+//                    Object result = asin.parse().value;
+//                    taTokens.setText(scanner.toStringTokens());
+//                    taErrores.setText(scanner.toStringErrores());
+//                    //System.out.println(scanner.toStringErrores());
+//                    //asin.imprimirErrores();
+//                    System.out.println("\n*** Resultados finales ***");
+//                } catch (Exception ex) {
+//                    ex.printStackTrace();
+//                }
+//
+//                /*BufferedReader bf = null;
+//                try {
+//                    //llamar a los tokens uno por uno, con la funcion nexttoken
+//                    bf = new BufferedReader(new FileReader(entrada));
+//                    //LexerAnalyzer a = new LexerAnalyzer(bf);
+//                    //Yytoken token = null;
+//                    do {
+//                        //token = a.nextToken();
+//                    } while (token != null);
+//
+//                    taTokens.setText(a.toStringTokens());
+//                    taErrores.setText(a.toStringErrores());
+//
+//                } catch (Exception ex) {
+//                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//                } finally {
+//                    try {
+//                        bf.close();
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }*/
+//            }
+//            labelDir.setText("Archivo .txt cargado correctamente");
+//            //taRespuestas.setText("Archivo:" + chooser.getSelectedFile().getPath() + "\n\nRespuestas de Tokens guardados en los siguientes archivos:\nfile.txt -> Contiene los tokens analizados con sus respectivos detalles\nerrores.txt -> Contiene los errores encontrados durante el analisis");
+//        } catch (Exception e) {
+//            labelDir.setText("Error: no se pudo cargar el archivo");
+//        }
     }//GEN-LAST:event_btnArchivoActionPerformed
 
     /**
@@ -326,4 +369,30 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JTextArea taErrores;
     private javax.swing.JTextArea taTokens;
     // End of variables declaration//GEN-END:variables
+
+    public static boolean moverArch(String archNombre) {
+        boolean efectuado = false;
+        File arch = new File(archNombre);
+        if (arch.exists()) {
+            System.out.println("\n*** Moviendo " + arch + " \n***");
+            Path currentRelativePath = Paths.get("");
+            String nuevoDir = currentRelativePath.toAbsolutePath().toString()
+                    + File.separator + "src" + File.separator
+                    + "analizador" + File.separator
+                    + "lexico" + File.separator + arch.getName();
+            File archViejo = new File(nuevoDir);
+            archViejo.delete();
+            if (arch.renameTo(new File(nuevoDir))) {
+                System.out.println("\n*** Generado " + archNombre + "***\n");
+                efectuado = true;
+            } else {
+                System.out.println("\n*** No movido " + archNombre + " ***\n");
+            }
+
+        } else {
+            System.out.println("\n*** Codigo no existente ***\n");
+        }
+        return efectuado;
+    }
+
 }
