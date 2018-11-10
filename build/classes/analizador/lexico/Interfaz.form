@@ -70,8 +70,8 @@
               </Group>
           </Group>
           <Group type="102" alignment="0" attributes="0">
-              <EmptySpace min="-2" pref="418" max="-2" attributes="0"/>
-              <Component id="jLabel9" min="-2" pref="345" max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="292" max="-2" attributes="0"/>
+              <Component id="jLabel9" min="-2" pref="633" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -193,7 +193,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Dialog" size="14" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Listado de Tokens V&#xe1;lidos"/>
+        <Property name="text" type="java.lang.String" value="Listado de Errores L&#xe9;xicos"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
@@ -201,7 +201,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Dialog" size="14" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Listado de Errores L&#xe9;xicos"/>
+        <Property name="text" type="java.lang.String" value="Listado de Errores Sint&#xe1;cticos"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
