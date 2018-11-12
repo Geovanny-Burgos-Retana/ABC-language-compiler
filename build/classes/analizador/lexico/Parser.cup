@@ -142,7 +142,7 @@ declaration_program ::=   RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN cuerp
                             {:
                                 parser.report_error("ERROR: Programa sin END", e);
                             :}*/
-                        | error:e
+                        | RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN error:e cuerpo_estructura_control RW_END
                             {:
                                 parser.report_error("Error en declaración bloques programa",e);
                             :};
@@ -449,6 +449,10 @@ bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHE
             {: 
                 parser.report_error("ERROR: Falta begin para el while", e);
             :}
+        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO RW_BEGIN error:e RW_END
+            {: 
+                parser.report_error("ERROR: Falta begin para el while", e);
+            :}
         ;
 
 bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN block_optional_if block_optional_else
@@ -463,7 +467,7 @@ bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW
             | RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e block_optional_if block_optional_else
                 {:                     
                     parser.report_error("Error: falta THEN en IF", e);
-                :}    
+                :}
             ;
 
 block_optional_else ::=   RW_ELSE RW_BEGIN cuerpo_estructura_control RW_END
@@ -507,18 +511,22 @@ bloque_for ::=    RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
                     :};
 
 //UTILITARIAS
-condicion_booleana ::= condicion_booleana1 | condicion_not 
-    | OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS
-    | RW_TRUE | RW_FALSE
-    | error:e 
-        {: 
-            parser.report_error("Error en condición booleana",e);
-        :}
-    ;
+condicion_booleana ::=    condicion_booleana1 
+                        | condicion_not 
+                        | OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS
+                        | RW_TRUE 
+                        | RW_FALSE                        
+                        | error:e 
+                            {: 
+                                parser.report_error("Error en condición booleana",e);
+                            :};
+
 
 condicion_not ::= OPB_NOT IDENTIFIER | OPB_NOT OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS;
 
-condicion_booleana1 ::= condicion_booleana2 operador_booleano condicion_booleana2;
+condicion_booleana1 ::=   condicion_booleana2 operador_booleano condicion_booleana2
+                        | condicion_booleana2 operador_booleano RW_TRUE
+                        | condicion_booleana2 operador_booleano RW_FALSE;
 
 condicion_booleana2 ::= IDENTIFIER | ENTERO | REAL;
 
