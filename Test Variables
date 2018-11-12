@@ -1,0 +1,46 @@
+PROGRAM Prueba
+CONST
+  Min        = 0;
+  Saludo    = "Hola";
+  Suma      = (3 * 2) + (5 * 4);                    // ERROR 4
+
+VAR
+  numero,limite,contador:int;
+  respuesta : STRING ;
+  varsintipo ;                                      // ERROR 9
+
+PROCEDURE funcion1()
+  BEGIN
+    while (a>8) do
+      BEGIN
+        i:=0;
+      END
+    funcion1:= 0;
+  END
+
+PROCEDURE funcion1()
+BEGIN
+  CONST
+    A := 123;                                       // ERROR 23
+  VAR
+    variable;                                       // ERROR 25
+    i: int;
+  while (a>8) do
+    BEGIN
+      i:=0;
+    END
+  funcion1:= 0;
+END
+
+BEGIN
+  VAR                                               // ERROR 35
+    i:int;                                          // ERROR 36
+  I: int;                                           // ERROR 37
+  read;                                             // ERROR 38
+  read(X);
+  read(123);                                        // ERROR 40
+
+  write(C);
+  write(C, 123, "Hola");
+  write( );                                         // ERROR 44
+END
