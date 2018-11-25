@@ -15,7 +15,7 @@ public class AnalizadorLexico {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Interfaz interfaz = new Interfaz();
+        MainInterfaz interfaz = new MainInterfaz();
         interfaz.setVisible(true);
     }
     

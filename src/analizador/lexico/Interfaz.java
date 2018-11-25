@@ -92,10 +92,10 @@ public class Interfaz extends javax.swing.JFrame {
         jPanel3.add(labelJFlex, java.awt.BorderLayout.PAGE_START);
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel1.setText("Listado de Tokens Válidos");
+        jLabel1.setText("Listado de Errores Léxicos");
 
         jLabel2.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        jLabel2.setText("Listado de Errores Léxicos");
+        jLabel2.setText("Listado de Errores Sintácticos");
 
         jLabel3.setText("Token");
 
@@ -168,8 +168,8 @@ public class Interfaz extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(194, 194, 194))))
             .addGroup(layout.createSequentialGroup()
-                .addGap(418, 418, 418)
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(292, 292, 292)
+                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -249,8 +249,9 @@ public class Interfaz extends javax.swing.JFrame {
                 LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
             AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
             Object result = asin.parse().value;
-            taTokens.setText(scanner.toStringTokens());
-            taErrores.setText(scanner.toStringErrores());
+            taTokens.setText(scanner.toStringErrores());
+            taErrores.setText(asin.toStringErrores());
+            //asin.printTablaSimbolos();
             //System.out.println(scanner.toStringErrores());
             //asin.imprimirErrores();
             System.out.println("\n*** Resultados finales ***");

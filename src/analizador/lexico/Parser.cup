@@ -3,10 +3,37 @@ package analizador.lexico;
 import java_cup.runtime.*;
 import java.io.FileReader;
 import java.util.ArrayList;
+import Semantico.Symb;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 parser code {:
 
     private ArrayList<String> errores = new ArrayList<String>();
+    private ArrayList<String> errSemanticos = new ArrayList<>();
+    private ArrayList<String> multi_vars = new ArrayList<>();
+    private ArrayList<String> params_funct = new ArrayList<>();
+    private int count_paramsFunct = 0;
+    private LexerAnalyzer scanner;
+    private ArrayList<Symb> tableSymb = new ArrayList<>();
+    private String funct_current = "";
+    private String type_current = "";
+
+    public String toStringErrores() {        
+        String value = "";
+        for (String error : errores)            
+            value += error + "\n";
+        return value;
+    }
+
+    public void setScanner(LexerAnalyzer lexer){
+        scanner = lexer;
+    }
 
     @Override
     protected int error_sync_size () { return 1; }
@@ -30,7 +57,7 @@ parser code {:
     
     /* Reporte de error encontrado. */
     public void report_error(String message, Object info) {
-        StringBuilder m = new StringBuilder("Error");
+        StringBuilder m = new StringBuilder("ERROR");
         if (info instanceof java_cup.runtime.Symbol) {
             java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
             if (s.left >= 0) {                
@@ -41,22 +68,13 @@ parser code {:
         }
         m.append(" : "+message);
         System.out.println(m.toString());
-
+        errores.add(m.toString());
     }
 
     @Override
     public void syntax_error(Symbol s){
         System.out.println("compiler has detected a syntax error at line " + s.left 
             + " column " + s.right);
-    }
-   
-    /* Cuando se encuentra un error de donde el sistema no puede
-        recuperarse, se lanza un error fatal. Se despliega el mensaje
-        de error y se finaliza la ejecucion. */
-    public void report_fatal_error(String message, Object info) {
-        report_error(message, info);
-        System.out.println("ENTRO");
-        //System.exit(1);
     }
 
     public void reportar_error(String message, Object info) {
@@ -73,6 +91,73 @@ parser code {:
         System.out.println(m.toString());
         errores.add(m.toString());
     }
+
+    public boolean add_to_TS(String name, String type_token, String data_type, int line, String ambito, int qty_params) {        
+        for (Symb sym: tableSymb) {
+            if (name.equals(sym.getName()) && ambito.equals(sym.getAmbito())) {
+                errSemanticos.add("Doblemente declarada: " + name);
+                return false;
+            }
+        }
+        Symb newSym = new Symb(name, type_token, data_type, line, ambito, qty_params);
+        tableSymb.add(newSym);
+        return true;
+    }
+
+    public void add_multiVars_to_TS(String dt, int line){
+        for (String var : multi_vars) {            
+            add_to_TS(var, "VAR", dt, line, getFunction(), 0);
+        }
+        multi_vars.clear();
+    }
+
+    public void printTablaSimbolos(){
+        try {
+            String arch = "TablaSimbolos.txt";
+            BufferedWriter out = new BufferedWriter(new FileWriter(arch));
+            int cont=0;
+            for(Symb s: tableSymb){
+                out.write(cont+"=>"+s.toString());
+                out.newLine();
+                cont++;
+            }
+            out.close();
+        } catch (IOException ex) {
+            
+        }
+    }
+
+    public String getFunction() {
+        if (funct_current.equals("")) {
+            return "GLOBAL";
+        } else {
+            return funct_current;
+        }
+    }
+
+    public boolean setQty_paramsFunct(String id_funct) {
+        for (Symb symb : tableSymb) {
+            if (id_funct.equals(symb.getName())) {
+                symb.setQty_params(count_paramsFunct);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void params_into_TS(String id, String dt, int line) {
+        add_to_TS(id, "PARAM", dt, line, funct_current, 0); 
+        count_paramsFunct += 1;       
+    }
+
+    public String toStringErrSem() {
+        String value = "****** ERRORES SEMANTICOS ******\n";
+        for (String errSemantico : errSemanticos) {
+            value += errSemantico + "\n";
+        }
+        return value;
+    }
+
 :}
 
 // TERMINALES -----------------------------------------------------------------
@@ -108,29 +193,29 @@ non terminal
     variables_section, declarations_variables, declaration_var,
     functions_section, function, procedure, parameters, parameters_list, value,
     seccion_instrucciones, seccion_instrucciones1,
-    bloque_while, bloque_if, bloque_for,
+    bloque_while, bloque_if, block_optional_if, block_optional_else, bloque_for,
     condicion_booleana, condicion_booleana1, condicion_booleana2, condicion_not, operador_booleano, operador_aritmetico,
-    cuerpo_estructura_control, cuerpo_estructura_control1, sentencia;
+    cuerpo_estructura_control, cuerpo_estructura_control1, sentencia,
+    write_funct_call, parameters_write, params_list_write, read_funct_call,
+    values_params, params_funct_call, params_list_funt_call,
+    operador_aritmetico1;
 
 /* Precedencia y asociación de terminales-------------------------*/
+precedence left OP_LEFTPARENTHESIS;
 
 // GRAMATICA
 start with declaration_program;
 
-declaration_program ::=   RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN seccion_instrucciones RW_END
-                        | error:e IDENTIFIER optional_sections RW_BEGIN seccion_instrucciones RW_END
+declaration_program ::=   RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN cuerpo_estructura_control RW_END
+                        | error:e IDENTIFIER optional_sections RW_BEGIN cuerpo_estructura_control RW_END
                             {:
                                 parser.report_error("ERROR: Sin PROGRAM",e);
                             :}
-                        | RW_PROGRAM error:e optional_sections RW_BEGIN seccion_instrucciones RW_END
+                        | RW_PROGRAM error:e optional_sections RW_BEGIN cuerpo_estructura_control RW_END
                             {:
                                 parser.report_error("ERROR: Programa sin IDENTIFICADOR", e);
                             :}
-                        /*| RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN seccion_instrucciones error:e
-                            {:
-                                parser.report_error("ERROR: Programa sin END", e);
-                            :}*/
-                        | error:e
+                        | RW_PROGRAM IDENTIFIER optional_sections RW_BEGIN error:e cuerpo_estructura_control RW_END
                             {:
                                 parser.report_error("Error en declaración bloques programa",e);
                             :};
@@ -144,9 +229,10 @@ optional_sections ::=     constants_section variables_section functions_section
                         | variables_section functions_section
                         | /* epsilon*/;
 
-optional_sections2 ::=    constants_section variables_section
-                        | constants_section
-                        | variables_section
+optional_sections2 ::=    constants_section variables_section seccion_instrucciones
+                        | constants_section seccion_instrucciones
+                        | variables_section seccion_instrucciones
+                        | seccion_instrucciones
                         | /* epsilon */;
 // CONSTANTES
 constants_section ::= RW_CONST declarations_constants;
@@ -155,30 +241,9 @@ declarations_constants ::=    declaration_constant
                             | declaration_constant declarations_constants;                        
 
 declaration_constant ::=  IDENTIFIER:id OPB_EQUAL value OP_SEMI
-                        /*| IDENTIFIER:id error:e OP_SEMI
                             {:
-                                parser.report_error("ERROR #1:\n" + 
-                                                    "\tIDENTIFIER error OP_SEMI\n" +
-                                                    "\tDeclaración de constante incorrecta " + id + " ", e);
+                                add_to_TS(id.toString(), "CONST", "NONE", idleft, getFunction(), 0);
                             :}
-                        | IDENTIFIER:id OPB_EQUAL error:e OP_SEMI
-                            {:
-                                parser.report_error("ERROR #2:\n" +
-                                                    "\tIDENTIFIER OPB_EQUAL error OP_SEMI\n" +
-                                                    "\tDeclaración de constante incorrecta " + id + " ", e);
-                            :}
-                        | IDENTIFIER:id error:e value OP_SEMI
-                            {:
-                                parser.report_error("ERROR #3:\n" +
-                                                    "\tIDENTIFIER OPB_EQUAL error OP_SEMI\n" +
-                                                    "\tDeclaración de constante incorrecta " + id + " ", e);
-                            :}
-                        | error:e OPB_EQUAL OP_SEMI
-                            {:
-                                parser.report_error("ERROR #4:\n" +
-                                                    "\terror:e OPB_EQUAL OP_SEMI\n" +
-                                                    "\tDeclaración de constante incorrecta ", e);
-                            :}*/
                         | error:e OP_SEMI
                             {:
                                 parser.report_error("ERROR: Declaración de constante incorrecta ", e);
@@ -190,16 +255,15 @@ variables_section ::= RW_VAR declarations_variables;
 declarations_variables ::=    declaration_var
                             | declaration_var declarations_variables;
 
-declaration_var ::=   IDENTIFIER:e OP_TWOPOINTS DATA_TYPE OP_SEMI
-                    | IDENTIFIER OP_COMMA declaration_var
-                    /*| IDENTIFIER error:e OP_SEMI
+declaration_var ::=   IDENTIFIER:id OP_TWOPOINTS DATA_TYPE:dt OP_SEMI
                         {:
-                            parser.report_error("ERROR #1: Declaración de variable incorrecta", e);
+                            multi_vars.add(id.toString());
+                            add_multiVars_to_TS(dt.toString(), idleft);
                         :}
-                    | IDENTIFIER OP_TWOPOINTS error:e OP_SEMI
+                    | IDENTIFIER:id OP_COMMA 
                         {:
-                            parser.report_error("ERROR #2 : Declaración de variable incorrecta", e);
-                        :}*/
+                            multi_vars.add(id.toString());
+                        :} declaration_var
                     | error:e OP_SEMI
                         {:
                             parser.report_error("ERROR: Declaración de variable incorrecta", e);
@@ -211,28 +275,27 @@ functions_section ::=   function
                       | function functions_section
                       | procedure functions_section;
 
-function ::=  RW_FUNCTION IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-              RW_BEGIN optional_sections2 seccion_instrucciones IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
+function ::=  RW_FUNCTION IDENTIFIER:id {: funct_current = id.toString(); :}
+              OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE:dt
+              RW_BEGIN optional_sections2 IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                 {:
                     if(!id.equals(id_return)){
-                        parser.errores.add("ERROR: ID y ID de retorno distintos " + id + " != " + id_return);
-                        parser.report_error("ERROR: ID y ID de retorno distintos ", id + " != " + id_return);
+                        parser.report_error("ERROR: ID y ID de retorno distintos ", id);
+                    } else {
+                        add_to_TS(id.toString(), "FUNCT", dt.toString(), idleft, "GLOBAL", 0);
+                        setQty_paramsFunct(funct_current);
+                        count_paramsFunct = 0;
+                        funct_current = "";
+                        params_funct.clear();
                     }
                 :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS error:e
-                RW_BEGIN optional_sections2 seccion_instrucciones
-                IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
+            /*| RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS error:e
+                RW_BEGIN optional_sections2 IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                 {:
                     parser.report_error("ERROR: Función sin valor de retorno", e);
-                :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-                RW_BEGIN error:e
-                IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.report_error("ERROR: Funcióm con cuerpo incorrecto", e);
-                :}
+                :}*/
             | RW_FUNCTION IDENTIFIER error:e
-                RW_BEGIN optional_sections2 seccion_instrucciones 
+                RW_BEGIN optional_sections2 
                 IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                 {:
                     parser.report_error("ERROR: Función parametros proc cuerpo incorrecto", e);
@@ -241,95 +304,17 @@ function ::=  RW_FUNCTION IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPA
                 {:
                     parser.report_error("ERROR: Función estructura incorrecta", e);
                 :};
-            /*| RW_FUNCTION error:e OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-              RW_BEGIN IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Función sin nombre identificador" + e);
-                    parser.report_error("ERROR: Función sin nombre identificador", e);
-                :}
-            | RW_FUNCTION IDENTIFIER error:e OP_TWOPOINTS DATA_TYPE
-              RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Parentesis incorrectos para los parametros" + e);
-                    parser.report_error("ERROR: Parentesis incorrectos para los parametros", e);
-                :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS error:e
-              RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Un función debe tener valor de retorno" + e);
-                    parser.report_error("ERROR: Un función debe tener valor de retorno", e);
-                :}
-            /*| RW_FUNCTION OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-              RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Función sin nombre identificador" + "FUNCT");
-                    parser.report_error("ERROR: Función sin nombre identificador", "FUNCT");
-                :}
-            | RW_FUNCTION IDENTIFIER parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-                RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Procedimiento sin parentesis izquierdo para los parametros" + "PROC");
-                    parser.report_error("ERROR: Procedimiento sin parentesis izquierdo para los parametros", "PROC");
-                :}
-            | RW_FUNCTION IDENTIFIER parameters //OP_TWOPOINTS DATA_TYPE
-              RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Función sin parentesis para los parametros" + "PROC");
-                    parser.report_error("ERROR: Función sin parentesis para los parametros", "PROC");
-                :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_TWOPOINTS DATA_TYPE
-                RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Procedimiento sin parentesis derecho para los parametros" + "PROC");
-                    parser.report_error("ERROR: Procedimiento sin parentesis derecho para los parametros", "PROC");
-                :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
-              RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                {:
-                    parser.errores.add("ERROR: Un función debe tener valor de retorno" + "FUNCT");
-                    parser.report_error("ERROR: Un función debe tener valor de retorno", "FUNCT");
-                :}*/
-            /*| RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-                RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI error:e RW_END
-                {:
-                    parser.errores.add("ERROR: Linea inalcansable porque la linea de retorno esta antes" + e);
-                    parser.report_error("ERROR: Linea inalcansable porque la linea de retorno esta antes", e);
-                :}
-            | RW_FUNCTION IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS OP_TWOPOINTS DATA_TYPE
-                RW_BEGIN error:e RW_END
-                {:
-                    parser.errores.add("ERROR: Linea de retorno con estructura incorrecta" + e);
-                    parser.report_error("ERROR: Linea de retorno con estructura incorrecta", e);
-                :}
-            | RW_FUNCTION error:e RW_END
-                {:
-                    parser.errores.add("ERROR: Estructura de procedimiento incorrecta" + e);
-                    parser.report_error("ERROR: Estructura de procedimiento incorrecta", e);
-                :}*/
-  
 
 procedure ::=     RW_PROCEDURE IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
-                  RW_BEGIN optional_sections2 seccion_instrucciones 
+                  RW_BEGIN optional_sections2 
                   IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                     {:
                         if(!id.equals(id_return)){                            
                             parser.report_error("ERROR: Identificador de procedimiento y retorno distintos", id);
                         }
                     :}
-                /*| RW_PROCEDURE error:e OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
-                  RW_BEGIN optional_sections2 seccion_instrucciones
-                  IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.report_error("ERROR: Procedimiento sin nombre identificador", e);
-                    :}
-                | RW_PROCEDURE IDENTIFIER error:e
-                  RW_BEGIN optional_sections2 seccion_instrucciones
-                  IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.report_error("ERROR: Procedimiento con parentesis", e);
-                    :}*/
                 | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS error:e
-                  RW_BEGIN optional_sections2 seccion_instrucciones 
+                  RW_BEGIN optional_sections2 
                   IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                     {:
                         parser.report_error("ERROR: Procedimiento con valor de retorno", e);
@@ -341,7 +326,7 @@ procedure ::=     RW_PROCEDURE IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RI
                         parser.report_error("ERROR: Procedimiento cuerpo incorrecto", e);
                     :}
                 | RW_PROCEDURE IDENTIFIER error:e
-                  RW_BEGIN optional_sections2 seccion_instrucciones 
+                  RW_BEGIN optional_sections2 
                   IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                     {:
                         parser.report_error("ERROR: Procedimiento parametros proc cuerpo incorrecto", e);
@@ -350,192 +335,139 @@ procedure ::=     RW_PROCEDURE IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RI
                     {:
                         parser.report_error("ERROR: Procedimiento estructura incorrecta", e);
                     :};
-                /*| RW_PROCEDURE error:e RW_BEGIN 
-                  optional_sections2 IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.report_error("ERROR: Estructura de procedimiento incorrecta", e);
-                    :};*/
-                /*| RW_PROCEDURE OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS 
-                  RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.errores.add("ERROR: Procedimiento sin nombre identificador" + "PROC");
-                        parser.report_error("ERROR: Procedimiento sin nombre identificador", "PROC");
-                    :}
-                | RW_PROCEDURE IDENTIFIER parameters OP_RIGHTPARENTHESIS
-                  RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.errores.add("ERROR: Procedimiento sin parentesis izquierdo para los parametros" + "PROC");
-                        parser.report_error("ERROR: Procedimiento sin parentesis izquierdo para los parametros", "PROC");
-                    :}
-                | RW_PROCEDURE IDENTIFIER parameters
-                  RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.errores.add("ERROR: Procedimiento sin parentesis para los parametros" + "PROC");
-                        parser.report_error("ERROR: Procedimiento sin parentesis para los parametros", "PROC");
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters
-                  RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.errores.add("ERROR: Procedimiento sin parentesis derecho para los parametros" + "PROC");
-                        parser.report_error("ERROR: Procedimiento sin parentesis derecho para los parametros", "PROC");
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS 
-                  error:e RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.errores.add("ERROR: Un procedimiento no debe tener valor de retorno" + e);
-                        parser.report_error("ERROR: Un procedimiento no debe tener valor de retorno", e);
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS 
-                  RW_BEGIN IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI error:e RW_END
-                    {:
-                        parser.errores.add("ERROR: Linea inalcansable porque la linea de retorno esta antes" + e);
-                        parser.report_error("ERROR: Linea inalcansable porque la linea de retorno esta antes", e);
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS 
-                  RW_BEGIN error:e RW_END
-                    {:
-                        parser.errores.add("ERROR: Linea de retorno con estructura incorrecta" + e);
-                        parser.report_error("ERROR: Linea de retorno con estructura incorrecta", e);
-                    :}
-                | RW_PROCEDURE error:e RW_END
-                  {:
-                        parser.errores.add("ERROR: Estructura de procedimiento incorrecta" + e);
-                        parser.report_error("ERROR: Estructura de procedimiento incorrecta", e);
-                  :};*/
 
-parameters ::=    DATA_TYPE IDENTIFIER
-                | DATA_TYPE IDENTIFIER parameters_list
+parameters ::=    DATA_TYPE:dt IDENTIFIER:id
+                    {:
+                        params_into_TS(id.toString(), dt.toString(), idleft);
+                    :}
+                | DATA_TYPE:dt IDENTIFIER:id parameters_list
+                    {:
+                        params_into_TS(id.toString(), dt.toString(), idleft);
+                    :}
                 | /* epsilon */
                 | error:e
                     {:
                         parser.report_error("ERROR: Estructura de paramatro incorrecta", e);
                     :}; 
 
-/*parameters ::=    DATA_TYPE IDENTIFIER
-                | DATA_TYPE IDENTIFIER OP_COMMA parameters
-                | /* epsilon *//*
-                | error:e 
-                    {:
-                        parser.errores.add("ERROR: Estructura del parametros mal definida");
-                        parser.report_error("ERROR: Estructura del parametros mal definida",e);
-                    :};*/
-
-parameters_list ::=   OP_COMMA DATA_TYPE IDENTIFIER
-                    | OP_COMMA DATA_TYPE IDENTIFIER parameters_list
+parameters_list ::=   OP_COMMA DATA_TYPE:dt IDENTIFIER:id
+                        {:
+                            params_into_TS(id.toString(), dt.toString(), idleft);
+                        :}
+                    | OP_COMMA DATA_TYPE:dt IDENTIFIER:id parameters_list
+                        {:
+                            params_into_TS(id.toString(), dt.toString(), idleft);
+                        :}
                     | error:e
                         {:
                             parser.report_error("ERROR: Estructura del parametros mal definida", e);
                         :};
 
-
-
-
-value ::= /*add idenfiticador*/ ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK;
-
+value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK | NUMERAL_CHARACTER;
 
 //INSTRUCCIONES
 seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | seccion_instrucciones1; 
 
-
-seccion_instrucciones1 ::= bloque_while | bloque_if | bloque_for
-    | error:e 
-        {: 
-            parser.errores.add("Error en el cuerpo de instrucciones");
-            parser.report_error("Error en el cuerpo de instrucciones",e);
-        :}*/
-    ;
+seccion_instrucciones1 ::= bloque_while | bloque_if | bloque_for;
 
 //ESTRUCTURAS DE CONTROL
 bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
         RW_BEGIN cuerpo_estructura_control RW_END
         | RW_WHILE error:e cuerpo_estructura_control RW_END
             {: 
-                parser.errores.add("Falta expresión en while");
                 parser.report_error("Falta expresión en while", e);
             :}
         | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e cuerpo_estructura_control RW_END
             {: 
-                parser.errores.add("ERROR: Falta do para el while" + e);
                 parser.report_error("ERROR: Falta do para el while", e);
             :}
         | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO error:e cuerpo_estructura_control RW_END
             {: 
-                parser.errores.add("ERROR: Falta begin para el while" + e);
+                parser.report_error("ERROR: Falta begin para el while", e);
+            :}
+        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO RW_BEGIN error:e RW_END
+            {: 
                 parser.report_error("ERROR: Falta begin para el while", e);
             :}
         ;
 
-bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN RW_BEGIN cuerpo_estructura_control RW_END |
-    RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN RW_BEGIN cuerpo_estructura_control RW_END RW_ELSE RW_BEGIN cuerpo_estructura_control RW_END
-    | RW_IF error:e RW_BEGIN
-        {: 
-            parser.errores.add("Error: falta paréntesis abrir en IF" + e);
-            parser.report_error("Error: falta paréntesis abrir en IF", e);
-        :}
-    | RW_IF OP_LEFTPARENTHESIS condicion_booleana error:e RW_BEGIN
-        {: 
-            System.out.println("ENTRA FALTA PARENTESIS CIERRE");
-            parser.errores.add("Error: falta paréntesis cerrar en IF" + e);
-            parser.report_error("Error: falta paréntesis cerrar en IF", e);
-        :}
-    | RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e RW_BEGIN
-        {: 
-            parser.errores.add("Error: falta THEN en IF" + e);
-            parser.report_error("Error: falta THEN en IF", e);
-        :}    
-    ;
+bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN block_optional_if block_optional_else
+            | RW_IF error:e block_optional_if block_optional_else 
+                {:
+                    parser.report_error("Error: falta paréntesis abrir en IF", e);
+                :}
+            | RW_IF OP_LEFTPARENTHESIS condicion_booleana error:e RW_THEN block_optional_if block_optional_else 
+                {:
+                    parser.report_error("Error: falta paréntesis cerrar en IF", e);
+                :}
+            | RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e block_optional_if block_optional_else
+                {:                     
+                    parser.report_error("Error: falta THEN o cuerpo incorrecto del IF", e);
+                :}
+            ;
 
- bloque_for ::= RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO RW_BEGIN cuerpo_estructura_control RW_END
-        | RW_FOR error:e OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
-            {: 
-                parser.errores.add("Error: en identificador en FOR" + e);
-                parser.report_error("Error: en identificador en FOR", e);
-            :}
-        | RW_FOR IDENTIFIER error:e ENTERO RW_TO ENTERO RW_DO
-            {: 
-                parser.errores.add("Error: en asignación en FOR" + e);
-                parser.report_error("Error: en asignación en FOR", e);
-            :}
-        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO error:e ENTERO RW_DO
-            {: 
-                parser.errores.add("Error: Falta TO en FOR" + e);
-                parser.report_error("Error: Falta TO en FOR", e);
-            :}
-        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO error:e RW_DO
-        RW_BEGIN cuerpo_estructura_control RW_END
-            {: 
-                System.out.println("ERROR ENTERO FOR");
-                parser.errores.add("Error: Falta entero en FOR" + e);
-                parser.report_error("Error: Falta entero en FOR", e);
-            :}
-        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO error:e
-        RW_BEGIN cuerpo_estructura_control RW_END
-            {: 
-                parser.errores.add("Error: Falta DO en FOR" + e);
-                parser.report_error("Error: Falta DO en FOR", e);
-            :}
-        | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
-        error:e cuerpo_estructura_control RW_END
-            {: 
-                parser.errores.add("Error: Falta BEGIN en FOR" + e);
-                parser.report_error("Error: Falta BEGIN en FOR", e);
-            :}
-        ;
+block_optional_else ::=   RW_ELSE RW_BEGIN cuerpo_estructura_control RW_END
+                        | RW_ELSE sentencia
+                        | /* epsilon */;
+
+block_optional_if ::= RW_BEGIN cuerpo_estructura_control RW_END
+                    | sentencia;
+
+bloque_for ::=    RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO 
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                | RW_FOR error:e OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                    {:
+                        parser.report_error("Error: en identificador en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER error:e ENTERO RW_TO ENTERO RW_DO
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                    {:
+                        parser.report_error("Error: en asignación en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO error:e ENTERO RW_DO
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                    {:
+                        parser.report_error("Error: Falta TO en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO error:e RW_DO
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                    {:
+                        parser.report_error("Error: Falta entero en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO error:e
+                  RW_BEGIN cuerpo_estructura_control RW_END
+                    {: 
+                        parser.report_error("Error: Falta DO en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO
+                  error:e cuerpo_estructura_control RW_END
+                    {: 
+                        parser.report_error("Error: Falta BEGIN en FOR", e);
+                    :}
+                | RW_FOR IDENTIFIER OP_TWOPOINTSEGUAL ENTERO RW_TO ENTERO RW_DO 
+                  RW_BEGIN cuerpo_estructura_control error:e 
+                    {: 
+                        parser.report_error("Error: Falta END en FOR", e);
+                    :};
 
 //UTILITARIAS
-condicion_booleana ::= condicion_booleana1 | condicion_not 
-    | OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS
-    | RW_TRUE | RW_FALSE
-    | error:e 
-        {: 
-            parser.errores.add("Error en condición booleana");
-            parser.report_error("Error en condición booleana",e);
-        :}
-    ;
+condicion_booleana ::=    condicion_booleana1 
+                        | condicion_not 
+                        | OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS operador_booleano OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS
+                        | RW_TRUE 
+                        | RW_FALSE                        
+                        | error:e 
+                            {: 
+                                parser.report_error("Error en condición booleana",e);
+                            :};
+
 
 condicion_not ::= OPB_NOT IDENTIFIER | OPB_NOT OP_LEFTPARENTHESIS condicion_booleana1 OP_RIGHTPARENTHESIS;
 
-condicion_booleana1 ::= condicion_booleana2 operador_booleano condicion_booleana2;
+condicion_booleana1 ::=   condicion_booleana2 operador_booleano condicion_booleana2
+                        | condicion_booleana2 operador_booleano RW_TRUE
+                        | condicion_booleana2 operador_booleano RW_FALSE;
 
 condicion_booleana2 ::= IDENTIFIER | ENTERO | REAL;
 
@@ -544,17 +476,81 @@ operador_booleano ::= OPB_EQUAL | OPB_GREATEREQUAL | OPB_GREATER | OPB_LESSEQUAL
 operador_aritmetico ::= OP_PLUSPLUS | OP_LESSLESS | OP_TWOPOINTSEGUAL | OP_PLUS | OP_LESS | OP_MULTIPLY | OP_DIVIDE | OP_MOD
     | OP_LEFTPARENTHESIS | OP_RIGHTPARENTHESIS | OP_PLUSEQUAL | OP_LESSEQUAL | OP_MULTEQUAL | OP_DIVEQUAL | OP_DIV;
 
+operador_aritmetico1 ::= OP_PLUS | OP_LESS | OP_MULTIPLY | OP_DIVIDE;
+
 cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_estructura_control;
 
 cuerpo_estructura_control1 ::=  bloque_while | bloque_if | bloque_for | sentencia;
 
-sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
-        | IDENTIFIER OP_PLUSPLUS OP_SEMI
-        | IDENTIFIER OP_LESSLESS OP_SEMI
-        | IDENTIFIER OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
-        | IDENTIFIER error:e OP_SEMI
-            {: 
-                parser.errores.add("Error en sentencia");
-                parser.report_error("Error en sentencia",e);
-            :}
+sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL OP_LESSLESS IDENTIFIER OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_PLUSPLUS OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_LESSLESS OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER operador_aritmetico1 IDENTIFIER OP_SEMI
+            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER operador_aritmetico1 value OP_SEMI
+            | read_funct_call OP_SEMI
+            | write_funct_call OP_SEMI
+            | IDENTIFIER OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
+            | IDENTIFIER error:e OP_SEMI
+                {:
+                    parser.report_error("Error en sentencia", e);
+                :}
         ;
+
+values_params ::= value
+                | IDENTIFIER OPB_EQUAL value
+                | IDENTIFIER operador_aritmetico1 IDENTIFIER
+                | IDENTIFIER operador_aritmetico1 value
+                | value operador_aritmetico1 IDENTIFIER
+                | value operador_aritmetico1 value
+                | IDENTIFIER;
+
+params_funct_call ::= values_params
+                    | values_params params_list_funt_call
+                    | /* epsilon */
+                    | error:e
+                        {:
+                            parser.report_error("ERROR: Estructura de paramatro incorrecta en llamada de función", e);
+                        :}; 
+
+params_list_funt_call ::= OP_COMMA values_params
+                        | OP_COMMA values_params params_list_funt_call
+                        | error:e
+                            {:
+                                parser.report_error("ERROR: Estructura del parametros mal definida en llamada de función", e);
+                            :};
+
+read_funct_call ::=   RW_READ OP_LEFTPARENTHESIS OP_RIGHTPARENTHESIS
+                    | RW_READ OP_LEFTPARENTHESIS IDENTIFIER OP_RIGHTPARENTHESIS
+                    | RW_READ error:e
+                        {:
+                            parser.report_error("ERROR: Llamada incorrecta a función READ", e);
+                        :};
+
+write_funct_call ::=  RW_WRITE OP_LEFTPARENTHESIS parameters_write OP_RIGHTPARENTHESIS
+                    | RW_WRITE error:e
+                        {:
+                            parser.report_error("ERROR: Llamada incorrecta a función WRITE", e);
+                        :};
+
+parameters_write ::=  IDENTIFIER
+                    | value
+                    | IDENTIFIER params_list_write
+                    | value params_list_write
+                    | error:e
+                        {:
+                            parser.report_error("ERROR: Estructura de paramatro en WRITE incorrecta", e);
+                        :};                    
+
+params_list_write ::= OP_COMMA IDENTIFIER
+                    | OP_COMMA value 
+                    | OP_COMMA IDENTIFIER params_list_write
+                    | OP_COMMA value params_list_write
+                    | error:e
+                        {:
+                            parser.report_error("ERROR: Estructura del parametros de llamada a función mal definida", e);
+                        :};
