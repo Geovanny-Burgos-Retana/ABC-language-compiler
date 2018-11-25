@@ -437,8 +437,8 @@ value ::= /*add idenfiticador*/ ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LIN
 seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | seccion_instrucciones1; 
 
 
-seccion_instrucciones1 ::= bloque_while /* | AGREGAR bloque_if | bloque_for */
-    /*| error:e 
+seccion_instrucciones1 ::= bloque_while | bloque_if | bloque_for
+    | error:e 
         {: 
             parser.errores.add("Error en el cuerpo de instrucciones");
             parser.report_error("Error en el cuerpo de instrucciones",e);
