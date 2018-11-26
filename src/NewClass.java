@@ -184,11 +184,79 @@ public class NewClass extends java_cup.runtime.lr_parser {
         increment_numParams(id.toString());
     }
     
+    public void sentence_into_TS1(String id1, int line){
+        if (existSymb(id1)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
+    
+    public void sentence_into_TS2(String id1, String id2, int line){
+        if (existSymb(id1) && existSymb(id2)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            ids.add(id2);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
+    
+    public void sentence_into_TS3(String id1, String id2, String id3, int line){
+        if (existSymb(id1)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            ids.add(id2);
+            ids.add(id3);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
+    
     public String toStringErrSem() {
         String value = "****** ERRORES SEMANTICOS ******\n";
         for (String errSemantico : errSemanticos) {
             value += errSemantico + "\n";
         }
         return value;
+    }
+    
+    public boolean existSymb(String id) {
+        for (Symb symb : tableSymb) {
+            if (id.equals(symb.getName()) && (funct_current.equals(symb.getAmbito()) || symb.getAmbito().equals("GLOBAL"))) {
+                return true;
+            }
+        }
+        errSemanticos.add("No declarada: " + id);
+        return false;
+    }
+    
+    public Symb getSymbTable(String id) {
+        for (Symb symb : tableSymb) {
+            if (id.equals(symb.getName())) {
+                return symb;
+            }
+        }
+        return null;
+    }
+    
+    public boolean corroborateTypes(ArrayList<String> ids) {        
+        Symb sym = getSymbTable(ids.get(0));
+        for (String id : ids) {
+            for (Symb symb : tableSymb) {
+                if(id.equals(symb.getName())){
+                    if (sym.getType_token().equals(symb.getType_token())) {
+                        break;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }
