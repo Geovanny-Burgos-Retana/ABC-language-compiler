@@ -258,7 +258,7 @@ public class MainInterfaz extends javax.swing.JFrame {
             //generar el nuevo archivo java a partir del flex
             String[] flex = {"src/analizador/lexico/Lexer.flex"};
             jflex.Main.main(flex);
-            String archSintactico = "C:\\Users\\gfran\\Desktop\\ABC-language-compiler\\src\\analizador\\lexico\\Parser.cup";
+            String archSintactico = "C:\\Users\\FranM\\OneDrive\\Documentos\\Git Repositorios\\ABC-language-compiler\\src\\analizador\\lexico\\Parser.cup";
             String[] asintactico = {"-parser", "AnalizadorSintactico", archSintactico};
             try {
                 java_cup.Main.main(asintactico);

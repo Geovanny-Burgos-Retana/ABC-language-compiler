@@ -168,6 +168,10 @@ class Yytoken {
     private Symbol symbol(int type, Object value) {
         return new Symbol(type, yyline, yycolumn, value);
     }
+
+    public int current_line(){
+        return yyline;
+    }
 %}
 
 // Inicializador de variables

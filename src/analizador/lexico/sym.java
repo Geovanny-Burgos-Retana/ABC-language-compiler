@@ -10,10 +10,10 @@ public class sym {
   /* terminals */
   public static final int OP_MULTIPLY = 29;
   public static final int RW_TO = 17;
-  public static final int RW_PROGRAM = 14;
   public static final int RW_BEGIN = 3;
-  public static final int OP_LESSLESS = 25;
+  public static final int RW_PROGRAM = 14;
   public static final int RW_UNTIL = 19;
+  public static final int OP_LESSLESS = 25;
   public static final int OP_TWOPOINTSEGUAL = 26;
   public static final int OP_RIGHTPARENTHESIS = 33;
   public static final int ENTERO = 52;
