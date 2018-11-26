@@ -99,7 +99,7 @@ parser code {:
                 return false;
             }
         }
-        Symb newSym = new Symb(name, type_token, data_type, line, ambito, qty_params);
+        Symb newSym = new Symb(name, type_token, data_type.toUpperCase(), line, ambito, qty_params);
         tableSymb.add(newSym);
         return true;
     }
@@ -158,6 +158,68 @@ parser code {:
         return value;
     }
 
+    public boolean existSymb(String id, int line) {
+        for (Symb symb : tableSymb) {
+            if (id.equals(symb.getName()) && (funct_current.equals(symb.getAmbito()) || symb.getAmbito().equals("GLOBAL"))) {
+                return true;
+            }
+        }
+        errSemanticos.add("No declarada: " + id + ". Linea: " + line);
+        return false;
+    }
+    
+    public Symb getSymbTable(String id) {
+        for (Symb symb : tableSymb) {
+            if (id.equals(symb.getName())) {
+                return symb;
+            }
+        }
+        return null;
+    }
+    
+    public boolean corroborateTypes(ArrayList<String> ids) {
+        Symb sym = getSymbTable(ids.get(0));
+        for (String id : ids) {
+            Symb symbol = getSymbTable(id);
+            System.out.println(id + " " + sym.getName() + " " + symbol.getData_type() + " " + sym.getData_type());
+            if (!(symbol.getData_type().equals(sym.getData_type())))
+                return false;
+        }
+        return true;
+    }
+
+    public void sentence_into_TS1(String id1, int line){
+        if (existSymb(id1, line)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
+    
+    public void sentence_into_TS2(String id1, String id2, int line){
+        if (existSymb(id1, line) && existSymb(id2, line)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            ids.add(id2);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
+    
+    public void sentence_into_TS3(String id1, String id2, String id3, int line){
+        if (existSymb(id1, line) && existSymb(id2, line) && existSymb(id3, line)) {
+            ArrayList<String> ids = new ArrayList<>();
+            ids.add(id1);
+            ids.add(id2);
+            ids.add(id3);
+            if(!corroborateTypes(ids)) {
+                errSemanticos.add("Tipos incompatibles. Linea: " + line);
+            }
+        }
+    }
 :}
 
 // TERMINALES -----------------------------------------------------------------
@@ -305,25 +367,18 @@ function ::=  RW_FUNCTION IDENTIFIER:id {: funct_current = id.toString(); :}
                     parser.report_error("ERROR: Función estructura incorrecta", e);
                 :};
 
-procedure ::=     RW_PROCEDURE IDENTIFIER:id OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
-                  RW_BEGIN optional_sections2 
-                  IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
+procedure ::=     RW_PROCEDURE IDENTIFIER:id {: funct_current = id.toString(); :} OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
+                  RW_BEGIN optional_sections2 IDENTIFIER:id_return OP_TWOPOINTSEGUAL value OP_SEMI RW_END
                     {:
                         if(!id.equals(id_return)){                            
                             parser.report_error("ERROR: Identificador de procedimiento y retorno distintos", id);
+                        } else {
+                            add_to_TS(id.toString(), "PROC", "NONE", idleft, "GLOBAL", 0);
+                            setQty_paramsFunct(funct_current);
+                            count_paramsFunct = 0;
+                            funct_current = "";
+                            params_funct.clear();
                         }
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS error:e
-                  RW_BEGIN optional_sections2 
-                  IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.report_error("ERROR: Procedimiento con valor de retorno", e);
-                    :}
-                | RW_PROCEDURE IDENTIFIER OP_LEFTPARENTHESIS parameters OP_RIGHTPARENTHESIS
-                  RW_BEGIN error:e
-                  IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI RW_END
-                    {:
-                        parser.report_error("ERROR: Procedimiento cuerpo incorrecto", e);
                     :}
                 | RW_PROCEDURE IDENTIFIER error:e
                   RW_BEGIN optional_sections2 
@@ -482,19 +537,52 @@ cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_est
 
 cuerpo_estructura_control1 ::=  bloque_while | bloque_if | bloque_for | sentencia;
 
-sentencia ::= IDENTIFIER OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL OP_LESSLESS IDENTIFIER OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL value OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_PLUSPLUS OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_LESSLESS OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER operador_aritmetico1 IDENTIFIER OP_SEMI
-            | IDENTIFIER OP_TWOPOINTSEGUAL IDENTIFIER operador_aritmetico1 value OP_SEMI
+sentencia ::= IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER:id2 OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_LESSLESS IDENTIFIER:id2 OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value OP_SEMI
+                {:
+                    existSymb(id1.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
+                {:
+                    existSymb(id1.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_PLUSPLUS OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LESSLESS OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 IDENTIFIER:id3 OP_SEMI
+                {:
+                    sentence_into_TS3(id1.toString(), id2.toString(), id3.toString(), id1left);
+                :}
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 value OP_SEMI
+                {:
+                    sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                :}
             | read_funct_call OP_SEMI
             | write_funct_call OP_SEMI
-            | IDENTIFIER OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
+            | IDENTIFIER:id1 OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
+                {:
+                    existSymb(id1.toString(), id1left);
+                :}
             | IDENTIFIER error:e OP_SEMI
                 {:
                     parser.report_error("Error en sentencia", e);
