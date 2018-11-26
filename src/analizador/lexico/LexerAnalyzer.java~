@@ -1461,6 +1461,10 @@ public class LexerAnalyzer implements java_cup.runtime.Scanner {
         return new Symbol(type, yyline, yycolumn, value);
     }
 
+    public int current_line(){
+        return yyline;
+    }
+
 
   /**
    * Creates a new scanner

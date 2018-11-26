@@ -289,9 +289,12 @@ public class MainInterfaz extends javax.swing.JFrame {
                 try {                    
                     LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(entrada));
                     AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
+                    asin.setScanner(scanner);
                     Object result = asin.parse().value;
                     area_scanner.setText(scanner.toStringErrores());
                     area_parser.setText(asin.toStringErrores());
+                    asin.printTablaSimbolos();
+                    System.out.println(asin.toStringErrSem());
                     System.out.println("\n*** Resultados finales ***");
                 } catch (Exception ex) {
                     ex.printStackTrace();

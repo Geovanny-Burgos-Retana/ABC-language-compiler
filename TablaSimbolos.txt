@@ -1,0 +1,10 @@
+0=>Symb{name=c1, type_token=CONST, data_type=NONE, linea=2, ambito=GLOBAL, qty_params=0}
+1=>Symb{name=c2, type_token=CONST, data_type=NONE, linea=3, ambito=GLOBAL, qty_params=0}
+2=>Symb{name=a, type_token=VAR, data_type=int, linea=6, ambito=GLOBAL, qty_params=0}
+3=>Symb{name=b, type_token=VAR, data_type=string, linea=7, ambito=GLOBAL, qty_params=0}
+4=>Symb{name=c, type_token=VAR, data_type=boolean, linea=8, ambito=GLOBAL, qty_params=0}
+5=>Symb{name=d, type_token=VAR, data_type=boolean, linea=8, ambito=GLOBAL, qty_params=0}
+6=>Symb{name=func1, type_token=FUNCT, data_type=INT, linea=12, ambito=GLOBAL, qty_params=0}
+7=>Symb{name=param2, type_token=PARAM, data_type=boolean, linea=18, ambito=func2, qty_params=0}
+8=>Symb{name=param1, type_token=PARAM, data_type=int, linea=18, ambito=func2, qty_params=0}
+9=>Symb{name=func2, type_token=FUNCT, data_type=INT, linea=18, ambito=GLOBAL, qty_params=2}

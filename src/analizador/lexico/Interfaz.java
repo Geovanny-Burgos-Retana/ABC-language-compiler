@@ -251,6 +251,7 @@ public class Interfaz extends javax.swing.JFrame {
             Object result = asin.parse().value;
             taTokens.setText(scanner.toStringErrores());
             taErrores.setText(asin.toStringErrores());
+            //asin.printTablaSimbolos();
             //System.out.println(scanner.toStringErrores());
             //asin.imprimirErrores();
             System.out.println("\n*** Resultados finales ***");
