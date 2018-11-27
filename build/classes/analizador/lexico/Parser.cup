@@ -221,6 +221,14 @@ parser code {:
             }
         }
     }
+
+    public void printAssemblerFile(){
+        if(errores.size() == 0 && errSemanticos.size() == 0){
+            asmCode.createAssemblerFile();
+        }
+        else
+            System.out.println("No se puede generar archivo .asm cuando hay errores en el codigo");
+    }
 :}
 
 // TERMINALES -----------------------------------------------------------------
@@ -321,7 +329,10 @@ declarations_variables ::=    declaration_var
 declaration_var ::=   IDENTIFIER:id OP_TWOPOINTS DATA_TYPE:dt OP_SEMI
                         {:
                             multi_vars.add(id.toString());
-                            add_multiVars_to_TS(dt.toString(), idleft);
+                            for (String var: multi_vars) {
+                                asmCode.generateGlobalVariables(var, dt);
+                            }
+                            add_multiVars_to_TS(dt.toString(), idleft);                            
                         :}
                     | IDENTIFIER:id OP_COMMA 
                         {:
@@ -427,8 +438,13 @@ seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | seccion
 seccion_instrucciones1 ::= bloque_while | bloque_if | bloque_for;
 
 //ESTRUCTURAS DE CONTROL
-bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
-        RW_BEGIN cuerpo_estructura_control RW_END
+bloque_while ::= RW_WHILE 
+                        {: asmCode.generateWhile(); :}
+                OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO
+                RW_BEGIN cuerpo_estructura_control 
+                RW_END
+                        {: asmCode.exitLabelWhile(); :}
+            
         | RW_WHILE error:e cuerpo_estructura_control RW_END
             {: 
                 parser.report_error("Falta expresión en while", e);
@@ -447,7 +463,10 @@ bloque_while ::= RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHE
             :}
         ;
 
-bloque_if ::= RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN block_optional_if block_optional_else
+bloque_if ::= RW_IF 
+                    {: asmCode.generateIf(); :}
+            OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN block_optional_if block_optional_else
+                    {: asmCode.exitLabelIf(); :}
             | RW_IF error:e block_optional_if block_optional_else 
                 {:
                     parser.report_error("Error: falta paréntesis abrir en IF", e);
@@ -541,10 +560,12 @@ cuerpo_estructura_control1 ::=  bloque_while | bloque_if | bloque_for | sentenci
 sentencia ::= IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticUnary(String id2, "++", String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_LESSLESS IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticUnary(String id2, "--", String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
                 {:
@@ -553,30 +574,37 @@ sentencia ::= IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER:id2 OP_SEM
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value OP_SEMI
                 {:
                     existSymb(id1.toString(), id1left);
+                    asmCode.AritmeticUnary(String value, ":=", String id1);
                 :}
-            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value operador_aritmetico value OP_SEMI
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value:op1 operador_aritmetico value:op2 OP_SEMI
                 {:
                     existSymb(id1.toString(), id1left);
+                    asmCode.AritmeticBinary(String op1, String op2, String operador_aritmetico, String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_PLUSPLUS OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticUnary(String id2, "++", String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LESSLESS OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticUnary(String id2, "--", String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticUnary(String id2, ":=", String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 IDENTIFIER:id3 OP_SEMI
                 {:
                     sentence_into_TS3(id1.toString(), id2.toString(), id3.toString(), id1left);
+                    asmCode.AritmeticBinary(String id2, String id3, String operador_aritmetico1, String id1);
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 value OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
+                    asmCode.AritmeticBinary(String id2, String value, String operador_aritmetico1, String id1);
                 :}
             | read_funct_call OP_SEMI
             | write_funct_call OP_SEMI
@@ -603,7 +631,7 @@ params_funct_call ::= values_params
                     | /* epsilon */
                     | error:e
                         {:
-                            parser.report_error("ERROR: Estructura de paramatro incorrecta en llamada de función", e);
+                            parser.report_error("ERROR: Estructura de parametro incorrecta en llamada de función", e);
                         :}; 
 
 params_list_funt_call ::= OP_COMMA values_params

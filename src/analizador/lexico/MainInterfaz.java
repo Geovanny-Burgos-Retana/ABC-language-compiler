@@ -295,6 +295,7 @@ public class MainInterfaz extends javax.swing.JFrame {
                     area_parser.setText(asin.toStringErrores());
                     asin.printTablaSimbolos();
                     System.out.println(asin.toStringErrSem());
+                    asin.printAssemblerFile();
                     System.out.println("\n*** Resultados finales ***");
                 } catch (Exception ex) {
                     ex.printStackTrace();
