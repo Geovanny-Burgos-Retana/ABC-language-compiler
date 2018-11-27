@@ -23,6 +23,7 @@ parser code {:
     private ArrayList<Symb> tableSymb = new ArrayList<>();
     private String funct_current = "";
     private String type_current = "";
+    private Assembler asmCode = new Assembler();
 
     public String toStringErrores() {        
         String value = "";
