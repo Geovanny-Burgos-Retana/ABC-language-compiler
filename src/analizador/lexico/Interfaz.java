@@ -244,7 +244,7 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGenerarActionPerformed
 
     private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
-        String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
+        /*String archivoPrueba = "C:\\Users\\gfran\\Documents\\Prueba_ABC.txt";
         try {
                 LexerAnalyzer scanner = new LexerAnalyzer(new FileReader(archivoPrueba));
             AnalizadorSintactico asin = new AnalizadorSintactico(scanner);
@@ -259,7 +259,7 @@ public class Interfaz extends javax.swing.JFrame {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        }*/
 //        try {
 //            JFileChooser chooser = new JFileChooser();
 //            FileNameExtensionFilter filter = new FileNameExtensionFilter("TEXT FILES", "txt", "text");

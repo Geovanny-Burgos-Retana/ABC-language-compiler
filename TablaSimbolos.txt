@@ -1,15 +1,2 @@
-0=>Symb{name=c1, type_token=CONST, data_type=NONE, linea=2, ambito=GLOBAL, qty_params=0}
-1=>Symb{name=c2, type_token=CONST, data_type=NONE, linea=3, ambito=GLOBAL, qty_params=0}
-2=>Symb{name=a, type_token=VAR, data_type=INT, linea=6, ambito=GLOBAL, qty_params=0}
-3=>Symb{name=f, type_token=VAR, data_type=INT, linea=6, ambito=GLOBAL, qty_params=0}
-4=>Symb{name=z, type_token=VAR, data_type=INT, linea=6, ambito=GLOBAL, qty_params=0}
-5=>Symb{name=b, type_token=VAR, data_type=STRING, linea=7, ambito=GLOBAL, qty_params=0}
-6=>Symb{name=c, type_token=VAR, data_type=BOOLEAN, linea=8, ambito=GLOBAL, qty_params=0}
-7=>Symb{name=d, type_token=VAR, data_type=BOOLEAN, linea=8, ambito=GLOBAL, qty_params=0}
-8=>Symb{name=func1, type_token=FUNCT, data_type=BOOLEAN, linea=12, ambito=GLOBAL, qty_params=0}
-9=>Symb{name=param2, type_token=PARAM, data_type=BOOLEAN, linea=18, ambito=func2, qty_params=0}
-10=>Symb{name=param1, type_token=PARAM, data_type=INT, linea=18, ambito=func2, qty_params=0}
-11=>Symb{name=func2, type_token=FUNCT, data_type=INT, linea=18, ambito=GLOBAL, qty_params=2}
-12=>Symb{name=y, type_token=PARAM, data_type=INT, linea=24, ambito=proc1, qty_params=0}
-13=>Symb{name=x, type_token=PARAM, data_type=INT, linea=24, ambito=proc1, qty_params=0}
-14=>Symb{name=proc1, type_token=PROC, data_type=NONE, linea=24, ambito=GLOBAL, qty_params=2}
+Symb{name=x, type_token=VAR, data_type=INT, linea=2, ambito=GLOBAL, qty_params=0}
+Symb{name=y, type_token=VAR, data_type=INT, linea=3, ambito=GLOBAL, qty_params=0}

@@ -96,7 +96,7 @@ parser code {:
     public boolean add_to_TS(String name, String type_token, String data_type, int line, String ambito, int qty_params) {        
         for (Symb sym: tableSymb) {
             if (name.equals(sym.getName()) && ambito.equals(sym.getAmbito())) {
-                errSemanticos.add("Doblemente declarada: " + name);
+                errSemanticos.add("Doblemente declarada: " + name + ". Linea: " + line);
                 return false;
             }
         }
@@ -108,6 +108,7 @@ parser code {:
     public void add_multiVars_to_TS(String dt, int line){
         for (String var : multi_vars) {            
             add_to_TS(var, "VAR", dt, line, getFunction(), 0);
+            asmCode.generateGlobalVariables(var, dt);
         }
         multi_vars.clear();
     }
@@ -182,7 +183,6 @@ parser code {:
         Symb sym = getSymbTable(ids.get(0));
         for (String id : ids) {
             Symb symbol = getSymbTable(id);
-            System.out.println(id + " " + sym.getName() + " " + symbol.getData_type() + " " + sym.getData_type());
             if (!(symbol.getData_type().equals(sym.getData_type())))
                 return false;
         }
@@ -303,6 +303,7 @@ optional_sections ::=     constants_section variables_section functions_section
 optional_sections2 ::=    constants_section variables_section seccion_instrucciones
                         | constants_section seccion_instrucciones
                         | variables_section seccion_instrucciones
+                        | variables_section
                         | seccion_instrucciones
                         | /* epsilon */;
 // CONSTANTES
@@ -329,9 +330,6 @@ declarations_variables ::=    declaration_var
 declaration_var ::=   IDENTIFIER:id OP_TWOPOINTS DATA_TYPE:dt OP_SEMI
                         {:
                             multi_vars.add(id.toString());
-                            for (String var: multi_vars) {
-                                asmCode.generateGlobalVariables(var, dt);
-                            }
                             add_multiVars_to_TS(dt.toString(), idleft);                            
                         :}
                     | IDENTIFIER:id OP_COMMA 
@@ -430,7 +428,12 @@ parameters_list ::=   OP_COMMA DATA_TYPE:dt IDENTIFIER:id
                             parser.report_error("ERROR: Estructura del parametros mal definida", e);
                         :};
 
-value ::= ENTERO | REAL | SCIENTIFIC_NOTATION | STRING_LINE | STRING_BLOCK | NUMERAL_CHARACTER;
+value ::= ENTERO:valor {:RESULT = valor;:}
+         | REAL:valor {:RESULT = valor;:}
+         | SCIENTIFIC_NOTATION:valor {:RESULT = valor;:}
+         | STRING_LINE:valor {:RESULT = valor;:}
+         | STRING_BLOCK:valor {:RESULT = valor;:}
+         | NUMERAL_CHARACTER:valor {:RESULT = valor;:};
 
 //INSTRUCCIONES
 seccion_instrucciones ::= seccion_instrucciones1 seccion_instrucciones | seccion_instrucciones1; 
@@ -448,41 +451,23 @@ bloque_while ::= RW_WHILE
         | RW_WHILE error:e cuerpo_estructura_control RW_END
             {: 
                 parser.report_error("Falta expresión en while", e);
-            :}
-        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e cuerpo_estructura_control RW_END
-            {: 
-                parser.report_error("ERROR: Falta do para el while", e);
-            :}
-        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO error:e cuerpo_estructura_control RW_END
-            {: 
-                parser.report_error("ERROR: Falta begin para el while", e);
-            :}
-        | RW_WHILE OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_DO RW_BEGIN error:e RW_END
-            {: 
-                parser.report_error("ERROR: Falta begin para el while", e);
-            :}
-        ;
+            :};
 
-bloque_if ::= RW_IF 
-                    {: asmCode.generateIf(); :}
-            OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN block_optional_if block_optional_else
-                    {: asmCode.exitLabelIf(); :}
+bloque_if ::= RW_IF {: asmCode.generateIf(); :} OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS RW_THEN 
+              block_optional_if block_optional_else {: asmCode.exitLabelIf(); :}
             | RW_IF error:e block_optional_if block_optional_else 
                 {:
                     parser.report_error("Error: falta paréntesis abrir en IF", e);
-                :}
-            | RW_IF OP_LEFTPARENTHESIS condicion_booleana error:e RW_THEN block_optional_if block_optional_else 
-                {:
-                    parser.report_error("Error: falta paréntesis cerrar en IF", e);
-                :}
-            | RW_IF OP_LEFTPARENTHESIS condicion_booleana OP_RIGHTPARENTHESIS error:e block_optional_if block_optional_else
-                {:                     
-                    parser.report_error("Error: falta THEN o cuerpo incorrecto del IF", e);
-                :}
-            ;
+                :};
 
-block_optional_else ::=   RW_ELSE RW_BEGIN cuerpo_estructura_control RW_END
-                        | RW_ELSE sentencia
+block_optional_else ::=   RW_ELSE 
+                            {:
+                                asmCode.generateElse();
+                            :} RW_BEGIN cuerpo_estructura_control RW_END                          
+                        | RW_ELSE
+                            {:
+                                asmCode.generateElse();
+                            :} sentencia
                         | /* epsilon */;
 
 block_optional_if ::= RW_BEGIN cuerpo_estructura_control RW_END
@@ -548,10 +533,26 @@ condicion_booleana2 ::= IDENTIFIER | ENTERO | REAL;
 
 operador_booleano ::= OPB_EQUAL | OPB_GREATEREQUAL | OPB_GREATER | OPB_LESSEQUAL | OPB_LESS | OPB_DIFERENT | OPB_OR | OPB_AND | OPB_NOT;
 
-operador_aritmetico ::= OP_PLUSPLUS | OP_LESSLESS | OP_TWOPOINTSEGUAL | OP_PLUS | OP_LESS | OP_MULTIPLY | OP_DIVIDE | OP_MOD
-    | OP_LEFTPARENTHESIS | OP_RIGHTPARENTHESIS | OP_PLUSEQUAL | OP_LESSEQUAL | OP_MULTEQUAL | OP_DIVEQUAL | OP_DIV;
+operador_aritmetico ::= OP_PLUSPLUS {:RESULT = "++";:} 
+                        | OP_LESSLESS  {:RESULT = "--";:}
+                        | OP_TWOPOINTSEGUAL {:RESULT = ":=";:}
+                        | OP_PLUS {:RESULT = "+";:}  
+                        | OP_LESS {:RESULT = "-";:}
+                        | OP_MULTIPLY {:RESULT = "*";:}
+                        | OP_DIVIDE {:RESULT = "/";:}
+                        | OP_MOD {:RESULT = "MOD";:}
+                        | OP_LEFTPARENTHESIS {:RESULT = "(";:}
+                        | OP_RIGHTPARENTHESIS {:RESULT = ")";:}
+                        | OP_PLUSEQUAL {:RESULT = "+=";:}
+                        | OP_LESSEQUAL {:RESULT = "-=";:}
+                        | OP_MULTEQUAL {:RESULT = "*=";:}
+                        | OP_DIVEQUAL {:RESULT = "/=";:}
+                        | OP_DIV {:RESULT = "DIV";:};
 
-operador_aritmetico1 ::= OP_PLUS | OP_LESS | OP_MULTIPLY | OP_DIVIDE;
+operador_aritmetico1 ::= OP_PLUS {:RESULT = "+";:}
+                        | OP_LESS {:RESULT = "-";:}
+                        | OP_MULTIPLY {:RESULT = "*";:}
+                        | OP_DIVIDE {:RESULT = "/";:};
 
 cuerpo_estructura_control ::= /*epsilon*/ |cuerpo_estructura_control1 cuerpo_estructura_control;
 
@@ -560,51 +561,53 @@ cuerpo_estructura_control1 ::=  bloque_while | bloque_if | bloque_for | sentenci
 sentencia ::= IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_PLUSPLUS IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticUnary(String id2, "++", String id1);
+                    asmCode.AritmeticUnary(id2.toString(), "++", id1.toString());
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL OP_LESSLESS IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticUnary(String id2, "--", String id1);
+                    asmCode.AritmeticUnary(id2.toString(), "--", id1.toString());
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LEFTPARENTHESIS params_funct_call OP_RIGHTPARENTHESIS OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
                 :}
-            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value OP_SEMI
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value:valor OP_SEMI
                 {:
                     existSymb(id1.toString(), id1left);
-                    asmCode.AritmeticUnary(String value, ":=", String id1);
+                    //System.out.println(valor);
+                    asmCode.AritmeticUnary(valor.toString(), ":=", id1.toString());
                 :}
-            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value:op1 operador_aritmetico value:op2 OP_SEMI
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL value:op1 operador_aritmetico:opa value:op2 OP_SEMI
                 {:
                     existSymb(id1.toString(), id1left);
-                    asmCode.AritmeticBinary(String op1, String op2, String operador_aritmetico, String id1);
+                    //System.out.println("opa: "+opa+" "+op1+" "+op2);
+                    asmCode.AritmeticBinary(op1.toString(), op2.toString(), opa.toString(), id1.toString());
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_PLUSPLUS OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticUnary(String id2, "++", String id1);
+                    asmCode.AritmeticUnary(id2.toString(), "++", id1.toString());
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_LESSLESS OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticUnary(String id2, "--", String id1);
+                    asmCode.AritmeticUnary(id2.toString(), "--", id1.toString());
                 :}
             | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticUnary(String id2, ":=", String id1);
+                    asmCode.AritmeticUnary(id2.toString(), ":=", id1.toString());
                 :}
-            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 IDENTIFIER:id3 OP_SEMI
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1:opa IDENTIFIER:id3 OP_SEMI
                 {:
                     sentence_into_TS3(id1.toString(), id2.toString(), id3.toString(), id1left);
-                    asmCode.AritmeticBinary(String id2, String id3, String operador_aritmetico1, String id1);
+                    asmCode.AritmeticBinary(id2.toString(), id3.toString(), opa.toString(), id1.toString());
                 :}
-            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1 value OP_SEMI
+            | IDENTIFIER:id1 OP_TWOPOINTSEGUAL IDENTIFIER:id2 operador_aritmetico1:opa value:v OP_SEMI
                 {:
                     sentence_into_TS2(id1.toString(), id2.toString(), id1left);
-                    asmCode.AritmeticBinary(String id2, String value, String operador_aritmetico1, String id1);
+                    asmCode.AritmeticBinary(id2.toString(), v.toString(), opa.toString(), id1.toString());
                 :}
             | read_funct_call OP_SEMI
             | write_funct_call OP_SEMI

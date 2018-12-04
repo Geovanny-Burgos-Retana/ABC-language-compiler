@@ -373,7 +373,7 @@ Error = [^]
     // ---------------------------------- 15 ----------------------------------
     {Scientific_Notation} {
         addToken(new Yytoken(count, yytext(), Types_Tokens.LITERAL_NUMERAL), yyline);
-        return symbol(sym.SCIENTIFIC_NOTATION, new Double(yytext()));
+        return symbol(sym.SCIENTIFIC_NOTATION, yytext());
     }
 
     // ---------------------------------- 16 ----------------------------------
